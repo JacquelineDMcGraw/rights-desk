@@ -1,0 +1,19 @@
+{
+  "name": "rights-desk",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Mobile-first creator rights, image provenance, and licensing prototype",
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server.mjs",
+    "dev": "node --env-file-if-exists=.env --watch server.mjs",
+    "check": "node scripts/check.mjs",
+    "test": "node test/case-offers.mjs && node test/ai-scope.mjs && node test/case-details.mjs",
+    "readiness": "node --env-file-if-exists=.env scripts/readiness.mjs",
+    "verify:ai": "node --env-file-if-exists=.env scripts/verify-ai.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
