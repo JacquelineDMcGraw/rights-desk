@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en" data-theme="graffiti">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#121214" />
+    <meta name="color-scheme" content="dark" />
+    <title>IP notes · Rights Desk</title>
+    <link rel="stylesheet" href="../themes.css" />
+    <link rel="stylesheet" href="../styles.css" />
+    <link rel="stylesheet" href="../ip-notes.css" />
+    <link rel="stylesheet" href="../graffiti.css" />
+    <link rel="stylesheet" href="./mobile-notes.css" />
+    <script src="./mobile-notes.js" defer></script>
+  </head>
+  <body>
+    <div class="device-shell">
+      <div class="app-shell mobile-notes-shell">
+        <header class="topbar">
+          <div class="brand"><span class="brand-mark" aria-hidden="true">r.</span><span>rights desk</span></div>
+          <button type="button" class="mobile-text-button" id="language-settings" hidden>Language setup</button>
+        </header>
+
+        <main id="main">
+          <section class="page-title page-pad">
+            <h1 id="notes-heading" tabindex="-1">IP <em>notes.</em></h1>
+            <p class="lede">Import a memo, turn it into text on your phone, and keep it with your private notes.</p>
+          </section>
+
+          <div class="mobile-feedback page-pad" id="feedback" hidden><p id="feedback-text" class="status-box" aria-hidden="true"></p></div>
+          <div class="mobile-visually-hidden" id="announcement" role="status" aria-atomic="true"></div>
+          <div class="mobile-visually-hidden" id="alert" role="alert" aria-atomic="true"></div>
+          <div class="mobile-feedback page-pad" id="initial-actions" hidden><button type="button" class="button outline" id="retry-open">Try again</button></div>
+
+          <section class="page-pad form-section" id="setup-screen" aria-labelledby="setup-heading" hidden>
+            <div class="surface form-stack">
+              <h2 id="setup-heading" tabindex="-1">Set up offline transcription</h2>
+              <p>Choose the language you speak in your memos. You can download it now or come back later. The download needs internet, then transcription works offline.</p>
+              <div class="field" id="language-field" hidden>
+                <label for="language">Spoken language</label>
+                <select id="language" aria-describedby="language-status"></select>
+              </div>
+              <p class="helper" id="language-status">Checking available languages…</p>
+              <div class="mobile-button-group">
+                <button type="button" class="button dark" id="download-language" disabled>Download language</button>
+                <button type="button" class="button outline" id="skip-setup">Skip for now</button>
+                <button type="button" class="mobile-text-button" id="retry-languages" hidden>Check languages again</button>
+              </div>
+            </div>
+          </section>
+
+          <section class="page-pad form-section" id="notes-screen" aria-labelledby="saved-heading" hidden>
+            <div class="surface form-stack mobile-capture">
+              <h2>Keep a new note</h2>
+              <div class="mobile-button-group" id="new-note-actions">
+                <button type="button" class="button dark" id="import-memo">Import a memo</button>
+                <button type="button" class="button outline" id="write-note">Write a note</button>
+              </div>
+              <p class="helper" id="import-help">Choose an M4A, WAV, or MP3 file up to 20 MB.</p>
+              <details class="ip-notes-watch-help" id="watch-help">
+                <summary>Import an Apple Watch memo</summary>
+                <p>Open Voice Memos on iPhone, find your memo in Watch Recordings, then choose <strong>Share → Save to Files</strong>. Return here and choose that file.</p>
+              </details>
+              <div class="mobile-button-group" id="resume-actions" hidden>
+                <p class="helper" id="resume-title"></p>
+                <button type="button" class="button dark" id="resume-draft">Resume draft</button>
+              </div>
+            </div>
+            <div class="section-heading"><h2 id="saved-heading" tabindex="-1">Saved notes</h2></div>
+            <div id="saved-notes" class="ip-notes-list"></div>
+          </section>
+
+          <section class="page-pad form-section" id="editor-screen" aria-labelledby="editor-heading" hidden>
+            <button type="button" class="mobile-text-button mobile-back" id="back-to-notes">← Back to notes</button>
+            <h2 id="editor-heading" tabindex="-1">Review your memo</h2>
+            <form id="note-editor" class="surface form-stack">
+              <div class="field">
+                <label for="note-title">Note title</label>
+                <input id="note-title" name="title" maxlength="120" placeholder="Name this note" required />
+              </div>
+              <div class="mobile-recording" id="recording" hidden>
+                <h3>Recording</h3>
+                <p class="helper ip-note-filename" id="recording-name"></p>
+                <div class="mobile-button-group mobile-playback">
+                  <button type="button" class="button outline" id="play-audio">Play recording</button>
+                  <button type="button" class="button outline" id="stop-audio">Stop playback</button>
+                </div>
+                <p class="helper" id="transcription-language"></p>
+                <div class="mobile-button-group">
+                  <button type="button" class="button dark" id="transcribe">Transcribe on this phone</button>
+                  <button type="button" class="mobile-text-button" id="change-language">Change language</button>
+                </div>
+                <p id="transcription-feedback" class="status-box" aria-hidden="true" hidden></p>
+                <div class="form-stack" id="replace-confirm" hidden>
+                  <p>Replace the text in this draft with a new transcript?</p>
+                  <div class="mobile-button-group">
+                    <button type="button" class="button dark" id="confirm-transcribe">Replace text</button>
+                    <button type="button" class="button outline" id="cancel-transcribe">Keep current text</button>
+                  </div>
+                </div>
+              </div>
+              <div class="field">
+                <label for="transcript" id="transcript-label">Transcript</label>
+                <textarea id="transcript" name="transcript" rows="6" maxlength="8000" aria-describedby="transcript-help" placeholder="Review or type the words here"></textarea>
+                <small id="transcript-help">Edit the text before saving. You can save the recording on its own.</small>
+                <button type="button" class="mobile-text-button" id="copy-transcript" hidden>Copy text</button>
+              </div>
+              <button type="submit" class="button dark full" id="save-note">Save private note</button>
+              <button type="button" class="mobile-text-button" id="discard-draft">Discard draft</button>
+              <div class="form-stack" id="discard-confirm" hidden>
+                <p id="discard-message">Discard this draft?</p>
+                <div class="mobile-button-group">
+                  <button type="button" class="button outline" id="confirm-discard">Discard draft</button>
+                  <button type="button" class="button outline" id="cancel-discard">Keep editing</button>
+                </div>
+              </div>
+            </form>
+          </section>
+        </main>
+
+        <footer class="page-pad mobile-notes-footer" id="notes-footer" hidden>
+          <p class="helper">Saved on this device</p>
+          <a id="web-desk-link" class="mobile-text-button" hidden>Open web desk <span aria-hidden="true">↗</span></a>
+        </footer>
+      </div>
+    </div>
+    <template id="note-card-template">
+      <article class="surface ip-note-card">
+        <div><h3 class="serif" tabindex="-1"></h3><time class="helper"></time></div>
+        <p class="helper ip-note-filename" hidden></p>
+        <p class="ip-note-text" hidden></p>
+        <button type="button" class="button outline">Open note</button>
+      </article>
+    </template>
+  </body>
+</html>

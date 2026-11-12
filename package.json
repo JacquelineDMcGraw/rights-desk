@@ -4,14 +4,16 @@
   "private": true,
   "license": "MIT",
   "type": "module",
-  "description": "Mobile-first creator rights, image provenance, and licensing prototype",
+  "description": "Mobile-first permission comparisons, creator-approved usage changes, and PayPal licensing",
   "scripts": {
     "start": "node --env-file-if-exists=.env server.mjs",
     "dev": "node --env-file-if-exists=.env --watch server.mjs",
     "check": "node scripts/check.mjs",
-    "test": "node test/case-offers.mjs && node test/ai-scope.mjs && node test/case-details.mjs",
+    "test": "node test/credentials.mjs && node test/permission-comparison.mjs && node test/permission-changes.mjs && node test/onboarding-practice.mjs && node test/practice-translations.mjs && node test/case-offers.mjs && node test/ai-scope.mjs && node test/case-details.mjs && node test/ip-notes.mjs && node test/legal-help.mjs",
     "readiness": "node --env-file-if-exists=.env scripts/readiness.mjs",
-    "verify:ai": "node --env-file-if-exists=.env scripts/verify-ai.mjs"
+    "verify:ai": "node --env-file-if-exists=.env scripts/verify-ai.mjs",
+    "verify:paypal": "node --env-file-if-exists=.env scripts/verify-paypal.mjs",
+    "verify:permissions": "node --env-file-if-exists=.env scripts/verify-permissions.mjs"
   },
   "engines": {
     "node": ">=22"

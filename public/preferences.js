@@ -1,7 +1,9 @@
 const STORAGE_KEY = 'rights-desk-theme-v1';
-const DEFAULT_THEME = 'caramellatte';
+const DEFAULT_THEME = 'graffiti';
 
 const PALETTES = [
+  { id: 'graffiti', name: 'Graffiti', description: 'Chalk and neon on asphalt · dark', browserColor: '#121214', swatches: ['#121214', '#1c1c21', '#f8f9fa', '#00f5d4', '#ffe600', '#ff2a85', '#ff6b00'] },
+  { id: 'sky', name: 'Sky', description: 'Navy, ice blue and bright accents · light', browserColor: '#142f53', swatches: ['#142f53', '#edf5fd', '#5ed9ee', '#f7cfe1', '#fff0b6'] },
   { id: 'caramellatte', name: 'Caramel Latte', description: 'Warm cream and caramel · light', browserColor: '#fff7ed', swatches: ['oklch(98% 0.016 73.684)', 'oklch(90% 0.076 70.697)', 'oklch(46.44% 0.111 37.85)', '#000'] },
   { id: 'sage', name: 'Sage', description: 'Soft cream and evergreen · light', browserColor: '#fbfaf6', swatches: ['#fbfaf6', '#d2dece', '#865231', '#23392e'] },
   { id: 'midnight', name: 'Midnight', description: 'Warm charcoal and golden light · dark', browserColor: '#2b2825', swatches: ['#2b2825', '#51493f', '#ffc887', '#f2d5a4'] },

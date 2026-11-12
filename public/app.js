@@ -4,10 +4,23 @@ import { CaseTour } from './tour.js';
 import { renderBuyerOffer, receiptText } from './offers.js';
 import { AppearanceSettings } from './preferences.js';
 import { CaseIntake } from './case-intake.js';
+import { PermissionChanges, permissionChangeTerms } from './permission-changes.js';
+import { RightsDeskOnboarding } from './onboarding.js';
+import { IpNotes } from './ip-notes.js';
+import { installLegalHelpLookup } from './permission-help.js';
 
 const tour = new CaseTour();
-const preferences = new AppearanceSettings({ onClose: syncCaseTour });
+const preferences = new AppearanceSettings({ onClose: () => { syncCaseTour(); syncLearningGuide(); } });
 const intake = new CaseIntake();
+const ipNotes = new IpNotes({ api, announce });
+const deskArchiveKey = 'rights-desk-desk-archive-v1';
+
+function readDeskArchive() {
+  try {
+    const ids = JSON.parse(localStorage.getItem(deskArchiveKey) || '[]');
+    return new Set(Array.isArray(ids) ? ids.filter(id => typeof id === 'string') : []);
+  } catch { return new Set(); }
+}
 
 const icons = {
   discover: '<svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M9 21v-7h6v7"/></svg>',
@@ -25,8 +38,11 @@ const state = {
   tab: validTab(location.hash.slice(1)),
   listings: [],
   cases: [],
+  archivedDeskCases: readDeskArchive(),
+  showDeskArchive: false,
   caseDocuments: [],
   licenses: [],
+  caseReceipts: [],
   status: { paypalConfigured: false, ollamaAvailable: false },
   loading: true,
   error: '',
@@ -56,7 +72,115 @@ const state = {
   licenseeName: '',
 };
 
-function validTab(value) { if (value === 'check') return 'protect'; return ['discover', 'protect', 'licenses', 'studio'].includes(value) ? value : 'discover'; }
+const permissionChanges = new PermissionChanges({
+  api, jsonPost, render, announce,
+  onCase(item) {
+    state.cases = [item, ...state.cases.filter(entry => entry.id !== item.id)];
+    permissionChanges.setPractice(item.id, Boolean(item.practice));
+    state.activeCaseId = item.id;
+    state.editingCaseId = null;
+    state.tab = 'protect';
+    state.caseDocuments = item.documents || [];
+    state.offerDraft = null;
+    state.offerError = '';
+    history.replaceState(null,'','#protect');
+    if (guideNextOwnReview && !item.practice) {
+      guideNextOwnReview = false;
+      onboarding.startGuide(item.id);
+    }
+  },
+  onOffer(caseId,offer) {
+    state.cases = state.cases.map(item => item.id === caseId ? { ...item,offers:[...(item.offers || []),offer] } : item);
+  },
+});
+state.permissionChanges = permissionChanges;
+
+let guideNextOwnReview = false;
+let startingPractice = false;
+const onboarding = new RightsDeskOnboarding({
+  onPractice: startPracticeReview,
+  onOwn: () => startOwnReview(true),
+  onEvidence: startEvidenceTour,
+  onNotes: () => {
+    if (window.rightsDeskNativeHome === true) {
+      window.location.href = 'rightsdesk://ip-notes';
+      return;
+    }
+    navTo('ip-notes');
+    requestAnimationFrame(() => { if (state.tab === 'ip-notes') tour.startNotes(); });
+  },
+  onClose: syncLearningGuide,
+});
+
+async function startPracticeReview() {
+  if (startingPractice) return;
+  startingPractice = true;
+  try {
+    tour.close();
+    navTo('protect');
+    const result = await permissionChanges.startPractice();
+    const id = typeof result === 'string' ? result : result?.id;
+    if (id) onboarding.startGuide(id);
+    return result;
+  } finally { startingPractice = false; }
+}
+
+function startOwnReview(guided = false) {
+  guideNextOwnReview = guided;
+  onboarding.pauseGuide();
+  navTo('protect');
+  requestAnimationFrame(() => {
+    const field = document.querySelector('#pc-new-title, #pc-new-medium');
+    let ancestor = field?.parentElement;
+    while (ancestor) {
+      if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+      ancestor = ancestor.parentElement;
+    }
+    field?.scrollIntoView({ block:'center', behavior:'instant' });
+    field?.focus({ preventScroll:true });
+  });
+}
+
+function startEvidenceTour() {
+  onboarding.pauseGuide();
+  navTo('protect');
+  requestAnimationFrame(() => { if (state.tab === 'protect' && !state.activeCaseId) tour.startCreate(); });
+}
+
+function updateDeskArchive({ restore = false, caseId } = {}) {
+  const cases = caseId ? state.cases.filter(item => item.id === caseId) : state.cases;
+  const archive = readDeskArchive();
+  for (const item of cases) {
+    if (restore) archive.delete(item.id);
+    else archive.add(item.id);
+  }
+  try { localStorage.setItem(deskArchiveKey, JSON.stringify([...archive])); }
+  catch { announce('Couldn’t save your desk view in this browser.',true); return; }
+  state.archivedDeskCases = archive;
+  state.showDeskArchive = Boolean(caseId);
+  render();
+  state.showDeskArchive = false;
+  const archiveSummary = caseId && document.querySelector('#private-desk-archive > summary');
+  (archiveSummary || document.querySelector('#private-desk-heading'))?.focus();
+  announce(restore ? (caseId ? 'Case restored to your desk.' : 'Cases restored to your desk.') : 'Desk cleared. Your cases are in Archived cases.');
+}
+
+function learningAudience() {
+  return state.buyerToken || (!state.cases.length && (state.caseReceipts.length || state.licenses.length)) ? 'buyer' : 'creator';
+}
+
+function offerOnboardingIfNeeded() {
+  if (state.loading || state.error || state.tab !== 'protect' || state.activeCaseId || location.search || state.caseReceipts.length || state.licenses.length) return;
+  onboarding.maybeOffer({ hasCases:state.cases.length > 0, buyerView:Boolean(state.buyerToken) });
+}
+
+function syncLearningGuide() {
+  const item = getCase(state.activeCaseId);
+  const current = item && !state.buyerToken && state.tab === 'protect' ? permissionChanges.getGuideState(item.id) : null;
+  onboarding.syncGuide(current || { caseId:null, stage:null, isPractice:false });
+}
+
+function validTab(value) { if (value === 'check') return 'protect'; return ['discover', 'protect', 'licenses', 'studio', 'ip-notes'].includes(value) ? value : 'protect'; }
 function escapeHtml(value = '') { return String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]); }
 function safeUrl(value) {
   if (!value || typeof value !== 'string') return '';
@@ -103,7 +227,7 @@ function announce(message, error = false) {
   clearTimeout(announce.timer);
   announce.timer = setTimeout(() => { state.toast = null; document.querySelector('#app .toast')?.remove(); }, 4900);
 }
-function navTo(tab) {
+function navTo(tab, { notesCampaignId } = {}) {
   if (state.buyerToken) {
     state.buyerToken = null;
     state.offerError = '';
@@ -112,13 +236,18 @@ function navTo(tab) {
     loadData();
   }
   state.tab = validTab(tab);
+  if (state.tab === 'ip-notes') ipNotes.enter(notesCampaignId);
   state.detailId = null;
   state.activeCaseId = null;
   state.editingCaseId = null;
   state.quote = null;
-  location.hash = state.tab;
+  // Internal navigation has already updated state. Avoid a queued hashchange
+  // resetting a newly opened practice case after its fast local API response.
+  if (location.hash !== `#${state.tab}` || location.search) history.pushState(null, '', `${location.pathname}#${state.tab}`);
   render();
   window.scrollTo({top:0, behavior:'instant'});
+  if (state.tab === 'ip-notes') document.querySelector('#ip-notes-heading')?.focus({ preventScroll:true });
+  offerOnboardingIfNeeded();
 }
 function openListing(id) {
   state.detailId = id;
@@ -129,25 +258,28 @@ function openListing(id) {
 
 async function loadData() {
   try {
-    const [listings, status, licenses, cases] = await Promise.all([
-      api('/api/listings'), api('/api/status'), api('/api/licenses'), api('/api/cases')
+    const [listings, status, licenses, cases, caseReceipts] = await Promise.all([
+      api('/api/listings'), api('/api/status'), api('/api/licenses'), api('/api/cases'), api('/api/case-receipts')
     ]);
     state.listings = Array.isArray(listings) ? listings : [];
     state.status = status || state.status;
     state.licenses = Array.isArray(licenses) ? licenses : [];
     state.cases = Array.isArray(cases) ? cases : [];
+    state.caseReceipts = Array.isArray(caseReceipts) ? caseReceipts : [];
     state.error = '';
   } catch (error) { state.error = error.message; }
   state.loading = false;
   render();
+  offerOnboardingIfNeeded();
 }
 
 function navMarkup() {
-  const tabs = [['discover','Discover'],['protect','Protect'],['licenses','Licenses'],['studio','Studio']];
-  return `<nav class="bottom-nav" aria-label="Main navigation">${tabs.map(([tab,label]) => `<button type="button" class="nav-item ${state.tab === tab ? 'active' : ''}" data-tab="${tab}" aria-label="${label}" ${state.tab === tab ? 'aria-current="page"' : ''}>${icons[tab]}<span>${label}</span></button>`).join('')}</nav>`;
+  const tabs = [['protect','My desk'],['discover','Discover'],['licenses','Records'],['studio','Studio']];
+  const activeTab = state.tab === 'ip-notes' ? 'protect' : state.tab;
+  return `<nav class="bottom-nav" aria-label="Main navigation">${tabs.map(([tab,label]) => `<button type="button" class="nav-item ${activeTab === tab ? 'active' : ''}" data-tab="${tab}" aria-label="${label}" ${state.tab === tab ? 'aria-current="page"' : ''}>${icons[tab]}<span>${label}</span></button>`).join('')}</nav>`;
 }
 function headerMarkup() {
-  return `<header class="topbar"><button type="button" class="brand" data-tab="discover" aria-label="Rights Desk home"><span class="brand-mark">r.</span><span>rights desk</span></button><div class="top-right"><span class="beta">HACKATHON BETA</span><button type="button" class="round-button settings-trigger" data-open-settings aria-label="Settings" aria-haspopup="dialog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9.5 3-.7 2.2-2 .9-2.2-.5-2.5 4.3 1.5 1.7v2.3l-1.5 1.7 2.5 4.3 2.2-.5 2 .9.7 2.2h5l.7-2.2 2-.9 2.2.5 2.5-4.3-1.5-1.7v-2.3l1.5-1.7-2.5-4.3-2.2.5-2-.9L14.5 3z"/><circle cx="12" cy="12.7" r="3.2"/></svg></button></div></header>`;
+  return `<header class="topbar"><a class="brand" href="/#protect" data-desk-home aria-label="Rights Desk home"><span class="brand-mark" aria-hidden="true">r.</span><span>rights desk</span></a><div class="top-right"><button type="button" class="round-button learn-trigger" data-open-onboarding aria-label="Learn how to use Rights Desk" title="How Rights Desk works"><span aria-hidden="true">?</span></button><button type="button" class="round-button settings-trigger" data-open-settings aria-label="Settings" aria-haspopup="dialog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9.5 3-.7 2.2-2 .9-2.2-.5-2.5 4.3 1.5 1.7v2.3l-1.5 1.7 2.5 4.3 2.2-.5 2 .9.7 2.2h5l.7-2.2 2-.9 2.2.5 2.5-4.3-1.5-1.7v-2.3l1.5-1.7-2.5-4.3-2.2.5-2-.9L14.5 3z"/><circle cx="12" cy="12.7" r="3.2"/></svg></button></div></header>`;
 }
 function introNote() {
   return `<div class="intro-note">${icons.shield}<span>Evidence makes an image’s creation trail visible. No automated check can prove human authorship on its own.</span></div>`;
@@ -203,13 +335,21 @@ function detailPage(item) {
     <section class="detail-body"><div class="eyebrow">${escapeHtml(declarationLabel(item.declaration))}</div><h1>${escapeHtml(item.title)}</h1><p class="detail-meta">by ${escapeHtml(item.artist || 'Unknown maker')} · licenses from ${dollars(item.basePrice)}</p><p class="detail-story">${escapeHtml(item.story || 'The maker has not added a story yet.')}</p></section>
     <section class="page-pad form-section"><h2>Origin & context</h2>${evidenceCard(item)}</section>
     <section class="page-pad form-section"><h2>License this image</h2><div class="surface"><form id="quote-form" class="form-stack"><div class="field"><label for="request">Tell us how you will use it</label><textarea name="request" id="request" maxlength="1000" required placeholder="For example: a one year editorial feature in a US magazine, online and print."></textarea><small>Include the type of project, where it will appear, and how long you need the rights.</small></div><button type="submit" class="button dark full" ${state.quoting ? 'disabled' : ''}>${state.quoting ? 'Building quote…' : 'Get a license quote'} ${icons.arrow}</button></form></div>
-      ${quote ? `<div class="surface" style="margin-top:12px"><div class="eyebrow">Your proposed license</div><div style="display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin-top:11px"><div class="quote-price">${dollars(quote.amount)}</div><span class="tag neutral">${quote.aiMode === 'ollama' ? 'AI interpreted request' : 'Rules based quote'}</span></div><div class="quote-grid"><div class="quote-cell"><small>Use</small><strong>${escapeHtml(quote.usage)}</strong></div><div class="quote-cell"><small>Term</small><strong>${escapeHtml(quote.term)}</strong></div><div class="quote-cell"><small>Territory</small><strong>${escapeHtml(quote.territory)}</strong></div><div class="quote-cell"><small>Base price</small><strong>${dollars(quote.basePrice)}</strong></div></div><p class="quote-explanation">${escapeHtml(quote.explanation || 'Price calculated from the maker’s base rate and the proposed use.')}</p>${Array.isArray(quote.assumptions) && quote.assumptions.length ? `<p class="quote-explanation" style="margin-top:8px">Assumptions: ${quote.assumptions.map(escapeHtml).join('; ')}</p>` : ''}<div style="margin-top:18px">${state.status.paypalConfigured ? `<button type="button" class="button dark full" data-checkout="true" ${state.checkingOut ? 'disabled' : ''}>${state.checkingOut ? 'Connecting to PayPal…' : 'Continue to PayPal Sandbox'} ${icons.arrow}</button>` : `<div class="status-box warn"><strong>PayPal Sandbox setup needed</strong>Add sandbox credentials to the local environment to enable a real test checkout. Quotes remain available.</div>`}</div></div>` : ''}</section>`;
+      ${quote ? `<div class="surface" style="margin-top:12px"><div class="eyebrow">Your proposed license</div><div style="display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin-top:11px"><div class="quote-price">${dollars(quote.amount)}</div><span class="tag neutral">${quote.aiMode === 'ollama' ? 'AI interpreted use' : 'Rules based quote'}</span></div><div class="quote-grid"><div class="quote-cell"><small>Use</small><strong>${escapeHtml(quote.usage)}</strong></div><div class="quote-cell"><small>Term</small><strong>${escapeHtml(quote.term)}</strong></div><div class="quote-cell"><small>Territory</small><strong>${escapeHtml(quote.territory)}</strong></div><div class="quote-cell"><small>Base price</small><strong>${dollars(quote.basePrice)}</strong></div></div><p class="quote-explanation">${escapeHtml(quote.explanation || 'Price calculated from the maker’s base rate and the proposed use.')}</p>${Array.isArray(quote.assumptions) && quote.assumptions.length ? `<p class="quote-explanation" style="margin-top:8px">Assumptions: ${quote.assumptions.map(escapeHtml).join('; ')}</p>` : ''}<div style="margin-top:18px">${state.status.paypalConfigured ? `<button type="button" class="button dark full" data-checkout="true" ${state.checkingOut ? 'disabled' : ''}>${state.checkingOut ? 'Connecting to PayPal…' : 'Continue to PayPal Sandbox'} ${icons.arrow}</button>` : `<div class="status-box warn"><strong>PayPal Sandbox setup needed</strong>Add sandbox credentials to the local environment to enable a real test checkout. Quotes remain available.</div>`}</div></div>` : ''}</section>`;
 }
 function licensesPage() {
-  return `<section class="page-title page-pad"><div class="eyebrow">Your image rights</div><h1>Ready for<br/><em>your work.</em></h1><p class="lede">Paid licenses and private downloads from this browser session appear here.</p></section><section class="page-pad form-section"><div class="section-heading"><h2>Your licenses</h2><small>${plural(state.licenses.length, 'license')}</small></div>${state.licenses.length ? `<div class="mini-list">${state.licenses.map(license => { const item = getListing(license.listingId); const download = safeUrl(license.downloadUrl || (license.licenseToken ? `/api/download/${encodeURIComponent(license.licenseToken)}` : '')); return `<div class="surface"><div class="eyebrow">Paid · ${escapeHtml(license.currency || 'USD')}</div><h3 class="serif" style="font-size:25px;margin:8px 0 5px">${escapeHtml(item?.title || license.title || 'Licensed image')}</h3><p class="helper">${escapeHtml(license.usage || 'Licensed use')} · ${escapeHtml(license.term || '')} · ${escapeHtml(license.territory || '')}</p><p class="helper" style="margin-top:5px">Order ${escapeHtml(license.orderId || '')}</p>${download ? `<a class="button dark full" style="margin-top:16px" href="${download}" download>Download licensed file ${icons.arrow}</a>` : ''}</div>`; }).join('')}</div>` : `<div class="empty-state"><div class="empty-icon">${icons.licenses}</div><h2>Your desk is clear</h2><p>Once a PayPal Sandbox payment completes, your license and download appear here.</p><button type="button" class="button dark" data-tab="discover">Explore images ${icons.arrow}</button></div>`}</section>`;
+  const receipts = state.caseReceipts;
+  const receiptCards = receipts.map(receipt => `<article class="surface"><div class="evidence-head"><div class="quote-price">${dollars(receipt.amount)}</div><span class="tag neutral">Paid · Sandbox</span></div><div class="eyebrow pc-space">${receipt.changeSnapshot ? 'Additional permission' : 'License record'}</div><h2 class="serif pc-space">${escapeHtml(receipt.title || 'Your work')}</h2><p class="helper pc-space">${escapeHtml(receipt.licensorName || 'Creator')} → ${escapeHtml(receipt.licenseeName || 'Buyer')} · ${escapeHtml(new Date(receipt.issuedAt).toLocaleDateString())}</p><details class="pc-history"><summary>View agreed permission</summary>${receipt.changeSnapshot ? permissionChangeTerms(receipt.changeSnapshot.approvedChange) : `<p class="helper pc-space">${escapeHtml(receipt.request || '')}</p>`}${receipt.changeHash ? `<p class="hash-line pc-space"><strong>Approved change fingerprint</strong> ${escapeHtml(receipt.changeHash)}</p>` : ''}</details><button type="button" class="button outline full pc-space" data-download-case-record="${escapeHtml(receipt.id)}">Download permission record ↓</button></article>`).join('');
+  const files = state.licenses.map(license => {
+    const item = getListing(license.listingId);
+    const download = safeUrl(license.downloadUrl || (license.licenseToken ? `/api/download/${encodeURIComponent(license.licenseToken)}` : ''));
+    return `<article class="surface"><div class="eyebrow">Licensed file · Sandbox</div><h2 class="serif pc-space">${escapeHtml(item?.title || license.title || 'Licensed image')}</h2><p class="helper pc-space">${escapeHtml(license.usage || 'Licensed use')} · ${escapeHtml(license.term || '')} · ${escapeHtml(license.territory || '')}</p>${download ? `<a class="button dark full pc-space" href="${download}" download>Download licensed file ↓</a>` : ''}</article>`;
+  }).join('');
+  return `<section class="page-title page-pad"><div class="eyebrow">Your permission records</div><h1>Permission.<br/><em>On record.</em></h1><p class="lede">Find your paid permissions and licensed files here. Keep a downloaded copy; these records are linked to this browser.</p></section><section class="page-pad form-section"><div class="section-heading"><h2>Saved payment records</h2><button type="button" class="tour-replay" data-refresh-records>Refresh</button></div>${receipts.length || state.licenses.length ? `<div class="mini-list">${receiptCards}${files}</div>` : '<div class="empty-state"><h2>Your records will be here.</h2><p>After a buyer pays, the agreed permission and payment confirmation appear here.</p><button type="button" class="button dark pc-space" data-start-own-review>Start my own review →</button><button type="button" class="button outline pc-space" data-open-onboarding>How it works</button></div>'}</section>`;
 }
+
 function syncCaseTour() {
-  if (preferences.isOpen) return;
+  if (preferences.isOpen || onboarding.isOpen) return;
   tour.sync({ tab: state.buyerToken ? 'offer' : state.tab, activeCaseId: getCase(state.activeCaseId)?.id, hasCases: state.cases.length > 0, loading: state.loading || state.offerLoading, error: state.error });
 }
 function render() {
@@ -218,14 +358,22 @@ function render() {
   if (state.buyerToken) {
     app.innerHTML = `${headerMarkup()}<main id="main">${renderBuyerOffer(state)}</main>`;
     syncCaseTour();
+    syncLearningGuide();
     return;
   }
   const detail = getListing(state.detailId);
   const activeCase = getCase(state.activeCaseId);
-  const content = state.loading ? '<div class="page-pad loading" style="padding-top:40px"><span class="spinner"></span>Opening Rights Desk…</div>' : state.error ? `<section class="page-pad" style="padding-top:40px"><div class="status-box error"><strong>Could not reach Rights Desk</strong>${escapeHtml(state.error)}</div><button type="button" class="button dark" data-retry="true" style="margin-top:16px">Try again</button></section>` : activeCase && state.tab === 'protect' ? (state.editingCaseId === activeCase.id ? renderCaseEditor(state, activeCase) : renderCaseDetail(state, activeCase)) : detail ? detailPage(detail) : ({discover:discoverPage, protect:() => renderProtect(state), licenses:licensesPage, studio:studioPage})[state.tab]();
+  const supportingRecords = app.querySelector('#permission-supporting-records');
+  const supportingRecordsOpen = supportingRecords?.open && supportingRecords.dataset.caseId === activeCase?.id;
+  const contractFieldFocused = supportingRecordsOpen && document.activeElement?.id === 'case-document';
+  if (activeCase) permissionChanges.setPractice(activeCase.id, Boolean(activeCase.practice));
+  const content = state.loading ? '<div class="page-pad loading" style="padding-top:40px"><span class="spinner"></span>Opening Rights Desk…</div>' : state.error ? `<section class="page-pad" style="padding-top:40px"><div class="status-box error"><strong>Could not reach Rights Desk</strong>${escapeHtml(state.error)}</div><button type="button" class="button dark" data-retry="true" style="margin-top:16px">Try again</button></section>` : activeCase && state.tab === 'protect' ? (state.editingCaseId === activeCase.id ? renderCaseEditor(state, activeCase) : renderCaseDetail(state, activeCase, { supportingRecordsOpen })) : detail ? detailPage(detail) : ({discover:discoverPage, protect:() => renderProtect(state), licenses:licensesPage, studio:studioPage, 'ip-notes':() => ipNotes.render()})[state.tab]();
   app.innerHTML = `${headerMarkup()}<main id="main">${content}</main>${navMarkup()}${state.toast ? `<div class="toast ${state.toast.error ? 'error' : ''}" role="status">${escapeHtml(state.toast.message)}</div>` : ''}`;
+  if (contractFieldFocused) app.querySelector('#case-document')?.focus({ preventScroll:true });
   intake.mount(activeCase && state.editingCaseId === activeCase.id ? activeCase : null);
+  if (state.tab === 'ip-notes' && !state.loading && !state.error) ipNotes.mount();
   syncCaseTour();
+  syncLearningGuide();
 }
 
 async function createListing(form) {
@@ -310,7 +458,7 @@ async function createCase(form) {
     history.replaceState(null, '', '#protect');
     render();
     window.scrollTo({top:0, behavior:'instant'});
-    announce('Private case created. Search public collections next.');
+    announce('Private case created. Compare what was allowed with the proposed use when you are ready.');
   } catch (error) { state.creatingCase = false; button.disabled = false; button.textContent = 'Create private case →'; announce(error.message, true); }
 }
 
@@ -353,6 +501,7 @@ async function openCase(id) {
   state.caseDocuments = getCase(id)?.documents || [];
   render();
   window.scrollTo({top:0, behavior:'instant'});
+  permissionChanges.load(id, { practice:Boolean(getCase(id)?.practice) });
   try {
     const docs = await api(`/api/cases/${encodeURIComponent(id)}/documents`);
     if (state.activeCaseId === id) { state.caseDocuments = Array.isArray(docs) ? docs : []; render(); }
@@ -377,6 +526,7 @@ async function searchCase() {
 async function uploadCaseDocument(form) {
   const id = state.activeCaseId;
   if (!id || state.uploadingDocument) return;
+  const sourceStage = getCase(id)?.caseType === 'permission-review' ? permissionChanges.getGuideState(id).stage : '';
   const file = new FormData(form).get('document');
   if (!(file instanceof File) || !file.size) { announce('Choose a supporting file.', true); return; }
   if (file.size > 10 * 1024 * 1024) { announce('Choose a file smaller than 10 MB.', true); return; }
@@ -385,9 +535,14 @@ async function uploadCaseDocument(form) {
   button.disabled = true;
   button.textContent = 'Saving document…';
   try {
-    await api(`/api/cases/${encodeURIComponent(id)}/documents`, {method:'POST', headers:{'Content-Type':file.type || 'application/octet-stream','X-File-Name':file.name}, body:file});
+    const name = file.name.replace(/[^\x20-\x7e]/g,'_');
+    const uploaded = await api(`/api/cases/${encodeURIComponent(id)}/documents`, {method:'POST', headers:{'Content-Type':file.type || 'application/octet-stream','X-File-Name':name}, body:file});
+    permissionChanges.selectSourceDocument(id,sourceStage,uploaded);
     const docs = await api(`/api/cases/${encodeURIComponent(id)}/documents`);
-    state.caseDocuments = Array.isArray(docs) ? docs : [];
+    if (Array.isArray(docs)) {
+      state.cases = state.cases.map(item => item.id === id ? { ...item, documents:docs } : item);
+      if (state.activeCaseId === id) state.caseDocuments = docs;
+    }
     announce('Supporting file saved privately.');
   } catch (error) { announce(error.message, true); }
   state.uploadingDocument = false;
@@ -552,6 +707,10 @@ async function copyOffer(id) {
 
 function downloadOfferReceipt(id) {
   const receipt = state.buyerToken ? state.offerReceipt : getCase(state.activeCaseId)?.offers?.find(offer => offer.id === id)?.receipt;
+  saveReceipt(receipt);
+}
+
+function saveReceipt(receipt) {
   if (!receipt) return;
   const url = URL.createObjectURL(new Blob([receiptText(receipt)], {type:'text/plain;charset=utf-8'}));
   const link = document.createElement('a');
@@ -588,7 +747,7 @@ async function checkoutOffer(form) {
   state.offerError = '';
   render();
   try {
-    const result = await jsonPost(`/api/offers/${encodeURIComponent(state.buyerToken)}/checkout`, {licenseeName:state.licenseeName,acceptedTerms:data.get('acceptedTerms') === 'on',termsVersion:state.buyerOffer.termsVersion});
+    const result = await jsonPost(`/api/offers/${encodeURIComponent(state.buyerToken)}/checkout`, {licenseeName:state.licenseeName,acceptedTerms:data.get('acceptedTerms') === 'on',termsVersion:state.buyerOffer.termsVersion,...(state.buyerOffer.changeSnapshot ? {acceptedChangeHash:state.buyerOffer.changeSnapshot.changeHash} : {})});
     const url = new URL(result.approvalUrl);
     if (url.protocol !== 'https:' || !(url.hostname === 'sandbox.paypal.com' || url.hostname.endsWith('.sandbox.paypal.com'))) throw new Error('PayPal returned an unexpected approval destination.');
     location.assign(url.href);
@@ -652,6 +811,46 @@ async function handleCheckoutReturn() {
 }
 
 document.addEventListener('click', event => {
+  const deskHome = event.target.closest('[data-desk-home]');
+  if (deskHome) {
+    if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    tour.close({ restoreFocus:false });
+    navTo('protect');
+    if (!onboarding.isOpen) document.getElementById('desk-home-heading')?.focus({ preventScroll:true });
+    return;
+  }
+  const learnTrigger = event.target.closest('[data-open-onboarding]');
+  if (learnTrigger) { tour.close(); onboarding.open({ audience:learningAudience(), trigger:learnTrigger }); return; }
+  if (event.target.closest('[data-start-own-review]')) { startOwnReview(); return; }
+  if (event.target.closest('[data-start-ip-notes-tour]')) { tour.startNotes(); return; }
+  if (event.target.closest('[data-ip-notes-retry]')) { ipNotes.load(); return; }
+  const caseNotes = event.target.closest('[data-case-ip-notes]');
+  if (caseNotes) { navTo('ip-notes', { notesCampaignId:caseNotes.dataset.caseIpNotes }); return; }
+  const notesBack = event.target.closest('[data-ip-notes-back]');
+  if (notesBack) {
+    navTo('protect');
+    if (getCase(notesBack.dataset.ipNotesBack)) openCase(notesBack.dataset.ipNotesBack);
+    return;
+  }
+  const guideTrigger = event.target.closest('[data-resume-permission-guide]');
+  if (guideTrigger) { onboarding.startGuide(guideTrigger.dataset.resumePermissionGuide); syncLearningGuide(); return; }
+  if (event.target.closest('[data-attach-original-contract], [data-attach-source]')) {
+    const records = document.querySelector('#permission-supporting-records');
+    if (records) {
+      onboarding.pauseGuide();
+      records.open = true;
+      records.querySelector('#case-document')?.focus();
+    }
+    return;
+  }
+  if (event.target.closest('[data-return-to-source]')) {
+    document.querySelector('#pc-source-document, #permission-source-form [data-attach-source]')?.focus();
+    return;
+  }
+  if (event.target.closest('[data-refresh-records]')) { state.loading = true; render(); loadData(); return; }
+  const savedRecord = event.target.closest('[data-download-case-record]');
+  if (savedRecord) { saveReceipt(state.caseReceipts.find(receipt => receipt.id === savedRecord.dataset.downloadCaseRecord)); return; }
   const settingsTrigger = event.target.closest('[data-open-settings]');
   if (settingsTrigger) { preferences.open(settingsTrigger); return; }
   if (event.target.closest('[data-edit-case]')) {
@@ -702,6 +901,10 @@ document.addEventListener('click', event => {
   if (filter) { state.filter = filter.dataset.filter; render(); return; }
   const listing = event.target.closest('[data-listing]');
   if (listing) { openListing(listing.dataset.listing); return; }
+  if (event.target.closest('[data-clear-private-desk]')) { updateDeskArchive(); return; }
+  if (event.target.closest('[data-restore-private-desk]')) { updateDeskArchive({ restore:true }); return; }
+  const restoreCase = event.target.closest('[data-restore-desk-case]');
+  if (restoreCase) { updateDeskArchive({ restore:true, caseId:restoreCase.dataset.restoreDeskCase }); return; }
   const caseButton = event.target.closest('[data-case]');
   if (caseButton) { openCase(caseButton.dataset.case); return; }
   if (event.target.closest('[data-back]')) { state.detailId = null; state.quote = null; render(); return; }
@@ -712,7 +915,18 @@ document.addEventListener('click', event => {
   if (event.target.closest('[data-checkout]')) { beginCheckout(); return; }
   if (event.target.closest('[data-retry]')) { state.loading = true; state.error = ''; render(); loadData(); }
 });
+
+window.addEventListener('storage', event => {
+  if (event.key !== deskArchiveKey) return;
+  state.archivedDeskCases = readDeskArchive();
+  if (state.tab === 'protect' && !state.activeCaseId && !state.buyerToken) render();
+});
+document.addEventListener('rights-desk-start-own-review', () => startOwnReview(true));
+document.addEventListener('rights-desk-pause-permission-guide', () => onboarding.pauseGuide());
+document.addEventListener('rights-desk-practice-replay', () => startPracticeReview().catch(error => announce(error.message,true)));
 document.addEventListener('submit', event => {
+  if (event.target.id === 'ip-note-form') { event.preventDefault(); ipNotes.save(event.target); }
+  if (event.target.matches('[data-ip-note-assignment]')) { event.preventDefault(); ipNotes.assign(event.target); }
   if (event.target.id === 'offer-draft-form') { event.preventDefault(); reviewOffer(event.target); }
   if (event.target.id === 'buyer-offer-form') { event.preventDefault(); checkoutOffer(event.target); }
   if (event.target.id === 'listing-form') { event.preventDefault(); createListing(event.target); }
@@ -720,8 +934,9 @@ document.addEventListener('submit', event => {
   if (event.target.id === 'case-form') { event.preventDefault(); if (intake.allowSubmit()) { if (state.editingCaseId) saveCaseDetails(event.target); else createCase(event.target); } }
   if (event.target.id === 'document-form') { event.preventDefault(); uploadCaseDocument(event.target); }
 });
-window.addEventListener('hashchange', () => { state.tab = validTab(location.hash.slice(1)); state.detailId = null; state.activeCaseId = null; state.editingCaseId = null; state.quote = null; render(); });
+window.addEventListener('hashchange', () => { state.tab = validTab(location.hash.slice(1)); if (state.tab === 'ip-notes') ipNotes.enter(); state.detailId = null; state.activeCaseId = null; state.editingCaseId = null; state.quote = null; render(); });
 
 render();
+installLegalHelpLookup();
 if (state.buyerToken) loadBuyerOffer().then(handleOfferReturn);
 else loadData().then(handleCheckoutReturn);

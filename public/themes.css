@@ -1,5 +1,91 @@
-/* Buildless equivalent of the supplied DaisyUI Caramel Latte theme. */
+/* Accessible graffiti palette from the supplied mobile UI reference. */
 :root,
+:root[data-theme="graffiti"] {
+  color-scheme: dark;
+  --bg-asphalt: #121214;
+  --bg-concrete: #1c1c21;
+  --text-chalk: #f8f9fa;
+  --accent-cyan: #00f5d4;
+  --accent-yellow: #ffe600;
+  --accent-magenta: #ff2a85;
+  --accent-orange: #ff6b00;
+  --color-base-100: #1c1c21;
+  --color-base-200: #121214;
+  --color-base-300: #73737f;
+  --color-base-content: #f8f9fa;
+  --color-primary: #00f5d4;
+  --color-primary-content: #121214;
+  --color-secondary: #f8f9fa;
+  --color-secondary-content: #121214;
+  --color-accent: #00f5d4;
+  --color-accent-content: #121214;
+  --color-neutral: #b8b8c2;
+  --color-neutral-content: #121214;
+  --color-info: #00f5d4;
+  --color-info-content: #121214;
+  --color-success: #00f5d4;
+  --color-success-content: #121214;
+  --color-warning: #ffe600;
+  --color-warning-content: #121214;
+  --color-error: #ff2a85;
+  --color-error-content: #121214;
+  --radius-selector: 2rem;
+  --radius-field: .5rem;
+  --radius-box: 1rem;
+  --size-selector: .25rem;
+  --size-field: .25rem;
+  --border: 2px;
+  --depth: 1;
+  --noise: 1;
+  --page-background: #121214;
+}
+:root:not([data-theme]),
+:root[data-theme="graffiti"] {
+  --radius-selector: .5rem;
+  --radius-field: .5rem;
+  --radius-box: .75rem;
+}
+
+/* Sky preserves the navy, ice-blue, cyan, pink and warm-yellow direction. */
+:root[data-theme="sky"] {
+  color-scheme: light;
+  --color-base-100: #ffffff;
+  --color-base-200: #edf5fd;
+  --color-base-300: #c8daed;
+  --color-base-content: #183858;
+  --color-primary: #5ed9ee;
+  --color-primary-content: #102c4d;
+  --color-secondary: #142f53;
+  --color-secondary-content: #f4f9ff;
+  --color-accent: #185e91;
+  --color-accent-content: #ffffff;
+  --color-neutral: #3d6185;
+  --color-neutral-content: #ffffff;
+  --color-info: #dcedff;
+  --color-info-content: #173f6b;
+  --color-success: #dcf5e9;
+  --color-success-content: #12543f;
+  --color-warning: #fff0b6;
+  --color-warning-content: #644714;
+  --color-error: #ffe3e9;
+  --color-error-content: #8d2343;
+  --radius-selector: 2rem;
+  --radius-field: .5rem;
+  --radius-box: 1rem;
+  --size-selector: .25rem;
+  --size-field: .25rem;
+  --border: 2px;
+  --depth: 1;
+  --noise: 1;
+  --page-background: #102743;
+}
+:root[data-theme="sky"] {
+  --radius-selector: 1rem;
+  --radius-field: .875rem;
+  --radius-box: 1.5rem;
+}
+
+/* Buildless equivalent of the supplied DaisyUI Caramel Latte theme. */
 :root[data-theme="caramellatte"] {
   color-scheme: light;
   --color-base-100: oklch(98% 0.016 73.684);
@@ -145,7 +231,6 @@
 
 /* Keep the supplied error tokens intact and soften the alert surface so its
    small text has enough contrast. The unblended token remains available. */
-:root:not([data-theme]),
 :root[data-theme="caramellatte"] {
   --error-bg: color-mix(in oklch, var(--color-error) 65%, var(--surface));
 }
@@ -154,4 +239,33 @@
   --text-muted: #222222;
   --shadow-color: transparent;
   --fog: #000000d9;
+}
+
+:root[data-theme="sky"] {
+  --text-muted: #486582;
+  --shadow-color: #173f6b12;
+  --focus: #176b9f;
+  --fog: #102743d9;
+  --control-border: #7693b2;
+  --sky-pink: #fce5ef;
+  --sky-navy: #142f53;
+  --sky-cyan: #5ed9ee;
+  --sky-ice: #edf5fd;
+}
+
+:root:not([data-theme]),
+:root[data-theme="graffiti"] {
+  --text-muted: #b8b8c2;
+  --control-border: #898996;
+  --focus: #ffe600;
+  --focus-glow: #ffe60033;
+  --shadow-color: #00000066;
+  --shadow: 4px 4px 0 var(--accent-cyan);
+  --overlay-shadow: #000000b3;
+  --danger-text: #ff2a85;
+  --fog: #050506e6;
+  --art-sun: #ffe600;
+  --art-sand: #ff6b00;
+  --art-middle: #ff2a85;
+  --art-deep: #121214;
 }

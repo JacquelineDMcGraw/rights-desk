@@ -1,35 +1,43 @@
 # Rights Desk — hackathon pitch
 
+## One-line pitch
+
+**Rights Desk helps independent creators compare existing permissions with proposed uses, approve a clear change, and connect its PayPal payment to the exact permission granted.**
+
 ## The opening
+
+A photographer grants a client permission to use three images on its website. The client later asks to run the same images in paid social advertisements. The photographer needs to compare the original permission, clarify the proposed use, decide the additional fee, and record what both sides approved.
+
+Rights Desk keeps those decisions together. The creator supplies the existing permission and a description of the proposed use. Local AI presents possible differences with exact source passages, asks about missing scope, and prepares terms for review. The creator controls the fee and approval; the buyer accepts that exact version and completes PayPal Sandbox checkout. The resulting receipt retains the approved change and its fingerprint, and is available in the case and Records.
+
+## What the product does
+
+1. **Start with the work.** Name the work and medium. The main permission review needs no image upload or location selection. Paste the relevant existing permission and describe the proposed use; optional supporting records remain private.
+2. **Compare with evidence.** A local Ollama model compares purpose, channels, duration, and territory. Passages from the original permission and proposed use appear together. The server checks each quotation against its source. Unclear or unsupported findings remain explicitly uncertain.
+3. **Clarify calmly.** Missing scope becomes one question at a time. Leave a question for later, go back, or save a draft. Old duration or territory is not silently carried into the proposed use. The model does not set fees or decide infringement.
+4. **Approve the exact change.** Review editable purpose, channels, duration, territory, conditions, and a creator-set fee. Confirm authority and inspect the buyer preview. The server stores an immutable snapshot and fingerprint; later comparisons cannot rewrite an approved offer.
+5. **Accept and pay.** The buyer sees approved terms, without private source texts or evidence. Checkout requires the accepted terms version and change fingerprint. PayPal confirms the payment; Rights Desk verifies order, offer reference, USD currency, and amount before issuing the receipt in the same case and in Records.
+
+## Demo path
+
+Existing website permission → proposed paid advertising → quote-backed comparison → clarify missing duration and territory → creator-approved change and fee → buyer review → PayPal Sandbox approval → verified receipt with the same change fingerprint.
+
+For learning, the optional guided example uses fictional records and stops before sharing a buyer link or creating a payment. Use a real review with fictional records or an authorized sample to demonstrate the complete payment flow. Show the actual AI badge, a question that matters, the creator's decision, and the real Sandbox result. Keep source search and general rights guidance as optional context outside the central three-minute story.
+
+The permission-change flow completed an actual $25 Sandbox capture on November 5, 2026 Eastern. Its real local AI comparison, creator-approved six-month U.S. paid-Instagram permission, exact buyer acceptance, and identical offer/order/receipt snapshots were verified. See [verification notes](docs/VERIFICATION.md) and the [synthetic provider-payment record](docs/permission-change-verification.json). The public video remains to be recorded.
+
+## Why this fits the hackathon
+
+AI performs a concrete comparison and clarification task before money moves. PayPal completes the approved transaction. The permission-change receipt connects the two: it records what was approved, what was accepted, and what was paid. The mobile flow supports creator control and avoids silently expanding permissions.
+
+The [official judging rules](https://paypalaihackathon.devpost.com/rules), checked November 5, 2026, evaluate implementation, design, impact, innovation, and presentation equally. Category fit is a strategy, not a prediction of a prize. Demonstrate actual creator usefulness and one coherent working path. See [the submission packet](docs/DEVPOST-SUBMISSION.md).
+
+## Image-economy context
 
 On **October 21, 2026**, Getty Images Holdings and several U.S. subsidiaries filed voluntary petitions for a **prepackaged Chapter 11 reorganization**. Getty says the process is intended to reduce debt and address non-operating liabilities while its business and contributor payments continue. The filing is a timely signal that the visual-licensing market is changing; it is **not evidence that generative AI caused Getty's bankruptcy**.[1][2]
 
 The underlying creator problem is clear in Getty's own filings. Its 2025 annual report describes unauthorized use of copyrighted work for AI training and AI images that can substitute for licensed photography as business risks. Getty reported paying more than **$220 million in royalties to contributors in 2025**, underscoring how many livelihoods depend on workable licensing. Its Creative revenue declined **3.6% year over year in the first half of 2026**, though Getty did not attribute that decline to AI.[3][4]
 
-## One-line pitch
-
-**Rights Desk takes U.S. creators from proof to permission to payment: preserve the work, gather rights evidence, approve a clear license offer, and connect its PayPal payment receipt to the case.**
-
-## What the product does
-
-1. **Open a private case.** A creator uploads a reference image or screenshot and records the medium, possible use, location, and facts. Rights Desk records a file hash to identify the exact reference. A spotlight tutorial walks through the first case and evidence collection. In the separate Studio flow, optional metadata and Content Credentials checks add origin signals; none of these checks certifies human authorship.
-2. **Find candidate matches.** The prototype searches Openverse, Wikimedia Commons, and the Library of Congress by title and short scene terms, then compares the uploaded image locally with a small sample of returned thumbnails. Each result links to its source record and displays available creator and license metadata. Coverage and unavailable sources are shown in the report. Copyright Office records and authorized image-search services are future integrations, not sources currently queried by the app.
-3. **Fill evidence gaps.** If there is no result, or a result conflicts with the creator's account, Rights Desk asks for the relevant originals, drafts, contracts, registration details, publication history, or correspondence. The checklist changes with the medium. A missed match never becomes a “free to use” or “you own it” verdict.
-4. **Guide the next step.** The U.S. flow asks for the creator's state, D.C., or territory and the medium, then points to the applicable federal copyright basics, relevant local resources, and practical choices: document, register, seek a license, request attribution or removal, or consult qualified counsel. It presents information and evidence for a person to review; it does not decide infringement or promise a legal outcome.
-5. **Draft permission for review.** From the case, the creator describes a proposed voluntary licensed use and base rate. A local model classifies scope into usage, duration, and territory, while fixed factors suggest a price. Assumptions stay visible. The creator reviews and approves the exact scope and price before creating a buyer link.
-6. **Connect permission to payment.** The buyer sees only the approved offer, reviews its terms, and can pay through PayPal Sandbox. The server verifies the capture against the exact offer reference, currency, and price before issuing a receipt in the case. The receipt identifies the work fingerprint, names, scope, amount, capture, and time. Case evidence stays private. A case offer records permission; Studio/Discover separately support delivery of a licensed source file after payment.
-
-## Demo path
-
-Open a private creator case → run a source-attributed search → review a visual lead or an honest no-result report → add relevant evidence → describe a proposed use → review the actual model's scope draft and the price → approve a voluntary offer → open its buyer link → complete PayPal Sandbox approval → show the verified receipt in the same case.
-
-This is the recording target. Real local `gemma3:4b` scope inference passed on November 5, 2026 Eastern; reproduce it with `npm run verify:ai`. Real Sandbox approval/capture remains pending and must be recorded before claiming the complete payment demonstration. Mock integration tests verify application behavior, not a real payment.
-
-## Why this fits the hackathon
-
-The creator's task gives PayPal a central role: a documented work becomes an explicit permission offer with a payment record. AI reduces the effort of converting a plain-language use into reviewable scope; a person controls the terms. The phone interface and first-case tutorial make that sequence understandable without a rights-management background. The strongest demo proves one complete case through to its receipt.
-
-The [official judging rules](https://paypalaihackathon.devpost.com/rules), checked November 5, 2026, evaluate implementation, design, impact, innovation, and presentation equally. This is a product argument to demonstrate, not a prediction of a prize. See [the submission packet](docs/DEVPOST-SUBMISSION.md) for the concrete pitch and recording plan.
 
 ## The honest coverage promise
 

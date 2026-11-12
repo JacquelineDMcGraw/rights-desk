@@ -1,0 +1,16 @@
+.ip-notes-entry { margin-block: 15px 8px; text-decoration: none; }
+.ip-notes-heading .tour-launch { margin-top: 13px; }
+.ip-notes-watch-help { color: var(--text); font-size: 13px; }
+.ip-notes-watch-help summary { min-height: 44px; padding-block: 13px; cursor: pointer; font-weight: 700; }
+.ip-notes-watch-help ol { margin: 0; padding-inline-start: 21px; }
+.ip-notes-watch-help li + li { margin-top: 6px; }
+.ip-notes-list { display: grid; gap: 12px; }
+.ip-notes-list .surface + .surface { margin-top: 0; }
+.ip-note-card { display: grid; min-width: 0; gap: 14px; }
+.ip-note-card h3 { color: var(--text-strong); font-size: 24px; overflow-wrap: anywhere; }
+.ip-note-text { color: var(--text); font-size: 14px; line-height: 1.55; overflow-wrap: anywhere; white-space: pre-wrap; }
+.ip-note-filename { margin-bottom: 6px; overflow-wrap: anywhere; }
+.ip-note-card audio { display: block; width: 100%; }
+.ip-note-transcript, .ip-note-transcript-form { display: grid; gap: 8px; min-width: 0; }
+.ip-note-transcript h4 { margin: 0; color: var(--text-strong); }
+.ip-note-assignment { display: grid; gap: 8px; }

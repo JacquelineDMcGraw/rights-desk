@@ -1,0 +1,13 @@
+{
+  "checkedAt": "2026-11-06T02:51:47.816Z",
+  "mode": "sandbox",
+  "title": "Harbor Study \u2014 Sandbox sample",
+  "aiMode": "ollama",
+  "amount": "25.00",
+  "currency": "USD",
+  "caseStatus": "PAID",
+  "paypalCaptureId": "2JJ13140M9465022U",
+  "licenseRecordId": "license_0d67aa8f-c27d-481f-b2c6-9fde71e752c4",
+  "acceptedTermsVersion": "rights-desk-license-v1",
+  "issuedAt": "2026-11-06T02:51:11.644Z"
+}

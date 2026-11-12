@@ -1,0 +1,110 @@
+/* Rights Desk adaptation of Jackie's Accessible Graffiti Mobile UI Kit.
+   Paint stays in decorative space; reading and form surfaces remain solid. */
+:root[data-theme="graffiti"] {
+  font-family:"Plus Jakarta Sans",system-ui,sans-serif;
+  --street-ink:#121214;
+  --street-chalk:#f8f9fa;
+  --street-cyan:#00f5d4;
+  --street-yellow:#ffe600;
+  --street-pink:#ff2a85;
+  --street-orange:#ff6b00;
+  --spray-underline:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 280 28' fill='none'%3E%3Cpath d='M4 12C68 4 154 6 274 9C240 13 110 15 18 19' stroke='%2300F5D4' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M48 15V24M135 13V26M218 12V22' stroke='%2300F5D4' stroke-width='3.5' stroke-linecap='round'/%3E%3Ccircle cx='14' cy='6' r='2' fill='%2300F5D4'/%3E%3Ccircle cx='262' cy='18' r='2.5' fill='%2300F5D4'/%3E%3C/svg%3E");
+  --paint-drips:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 42'%3E%3Cpath d='M0 0H120V8C108 8 104 14 104 22C104 26 100 26 100 22C100 12 92 8 84 8C78 8 76 15 76 34C76 39 70 39 70 34C70 16 65 8 56 8C48 8 46 14 46 20C46 24 41 24 41 20C41 11 35 8 24 8C16 8 14 18 14 27C14 31 8 31 8 27C8 14 5 8 0 8V0Z' fill='%23FF2A85'/%3E%3C/svg%3E");
+}
+:root[data-theme="graffiti"] .device-shell { background:radial-gradient(#383842 1px,transparent 1px) 0 0 / 14px 14px,var(--street-ink); }
+:root[data-theme="graffiti"] .app-shell { border-inline:1px solid #383842; box-shadow:none; }
+:root[data-theme="graffiti"] .topbar { height:88px; border-bottom:2px solid #383842; padding-bottom:18px; }
+:root[data-theme="graffiti"] .brand { min-height:48px; color:var(--street-chalk); letter-spacing:-.04em; font-family:"Space Grotesk",system-ui,sans-serif; font-size:19px; }
+:root[data-theme="graffiti"] .brand-mark,
+:root[data-theme="graffiti"] .rd-intro-brand > span { width:34px; height:34px; border:2px solid var(--street-chalk); border-radius:6px; font:700 22px "Space Grotesk",sans-serif; letter-spacing:-.08em; background:var(--street-cyan); color:var(--street-ink); box-shadow:3px 3px 0 var(--street-pink); }
+:root[data-theme="graffiti"] .round-button { color:var(--street-chalk); border:2px solid #b8b8c2; background:var(--surface); border-radius:10px; width:48px; height:48px; box-shadow:none; }
+:root[data-theme="graffiti"] .page-title { padding-top:28px; }
+:root[data-theme="graffiti"] h1,
+:root[data-theme="graffiti"] .page-title h1 { font-family:"Rubik Mono One","Space Grotesk",sans-serif; font-weight:400; font-size:clamp(1.7rem,7.5vw,2.5rem); line-height:1.2; letter-spacing:-.035em; text-transform:uppercase; overflow-wrap:anywhere; }
+:root[data-theme="graffiti"] h1 em { font-style:normal; color:var(--street-cyan); }
+:root[data-theme="graffiti"] :is(.serif,.section-heading h2,.form-section h2,.feature-copy h2,.empty-state h2,.evidence-head h2,.tile-title,.quote-price,.rd-intro h2,.rd-guide-card h2) { font-family:"Space Grotesk",system-ui,sans-serif; font-weight:700; letter-spacing:-.035em; }
+:root[data-theme="graffiti"] .eyebrow,
+:root[data-theme="graffiti"] :is(.rd-intro-eyebrow,.rd-guide-progress,.pc-progress,.tile-label) { font-family:ui-monospace,SFMono-Regular,monospace; font-weight:700; letter-spacing:.06em; }
+:root[data-theme="graffiti"] .lede { font-size:14px; line-height:1.7; max-width:100%; }
+:root[data-theme="graffiti"] .rd-desk-intro { padding-bottom:7px; }
+:root[data-theme="graffiti"] .rd-desk-intro > .eyebrow { display:inline-block; padding:8px 9px; border:2px solid var(--street-ink); border-radius:3px; background:var(--street-yellow); color:var(--street-ink); box-shadow:3px 3px 0 var(--street-cyan); transform:rotate(-1deg); margin-bottom:14px; }
+:root[data-theme="graffiti"] .rd-desk-intro h1 em { display:inline-block; position:relative; padding-bottom:22px; }
+:root[data-theme="graffiti"] .rd-desk-intro h1 em::after { content:""; position:absolute; inset:auto 0 0; height:24px; background:var(--spray-underline) left center / 100% 24px no-repeat; pointer-events:none; }
+:root[data-theme="graffiti"] .rd-desk-intro .lede { margin-top:9px; }
+:root[data-theme="graffiti"] :is(.surface,.feature-card,.preview-tile,.listing-card,.empty-state) { border:2px solid #858590; border-radius:12px; box-shadow:4px 4px 0 #383842; }
+:root[data-theme="graffiti"] .rd-learn-card { position:relative; border-color:var(--street-chalk); box-shadow:4px 4px 0 var(--street-cyan); padding-top:38px; }
+:root[data-theme="graffiti"] .rd-learn-card::before { content:""; position:absolute; right:12px; top:0; width:93px; height:33px; background:var(--paint-drips) top right / contain no-repeat; pointer-events:none; }
+:root[data-theme="graffiti"] .rd-learn-card .eyebrow { color:var(--street-yellow); }
+:root[data-theme="graffiti"] .rd-learn-card h2 { font-size:28px; }
+:root[data-theme="graffiti"] .button { border:2px solid var(--street-chalk); border-radius:10px; min-height:50px; padding:13px 16px; font-weight:800; font-size:13px; }
+:root[data-theme="graffiti"] :is(.button.dark,.settings-done) { background:var(--street-cyan); color:var(--street-ink); border-color:var(--street-chalk); box-shadow:3px 3px 0 var(--street-pink); }
+:root[data-theme="graffiti"] :is(.button.outline,.button.light) { background:var(--street-ink); color:var(--street-chalk); border-color:var(--street-cyan); box-shadow:none; }
+:root[data-theme="graffiti"] .button:not(:disabled):active { box-shadow:none; }
+:root[data-theme="graffiti"] :is(.field input,.field textarea,.field select) { min-height:50px; border:2px solid #b8b8c2; background:var(--street-ink); font-size:14px; border-radius:8px; line-height:1.65; }
+:root[data-theme="graffiti"] :is(input,textarea)::placeholder { color:#b8b8c2; opacity:1; }
+:root[data-theme="graffiti"] :is(input,textarea,select,button,a,summary):focus-visible { outline:3px solid var(--street-yellow); outline-offset:3px; }
+:root[data-theme="graffiti"] .field :is(input,textarea,select):focus { border-color:var(--street-cyan); box-shadow:none; }
+:root[data-theme="graffiti"] .field label { font-size:13px; }
+:root[data-theme="graffiti"] .radio-option { min-height:52px; align-items:flex-start; border-color:#858590; }
+:root[data-theme="graffiti"] :is(input[type="checkbox"],input[type="radio"]) { accent-color:var(--street-cyan); min-height:20px; min-width:20px; flex:none; }
+:root[data-theme="graffiti"] .permission-flow .radio-option input { width:20px; }
+:root[data-theme="graffiti"] .radio-option:has(input:checked) { border-color:var(--street-cyan); background:#132d2a; }
+:root[data-theme="graffiti"] .status-box { border:2px solid #858590; border-left:5px solid var(--street-cyan); border-radius:9px; background:var(--surface); }
+:root[data-theme="graffiti"] .status-box.warn { background:var(--warning-bg); border-color:var(--street-yellow); }
+:root[data-theme="graffiti"] .status-box.error { background:var(--error-bg); border-color:var(--street-orange); }
+:root[data-theme="graffiti"] .tag { border:1px solid currentColor; border-radius:4px; font-family:ui-monospace,monospace; }
+:root[data-theme="graffiti"] .pc-progress li { border:2px solid #858590; border-radius:6px; font-size:11px; }
+:root[data-theme="graffiti"] .pc-progress li.current { color:var(--street-ink); background:var(--street-yellow); border-color:var(--street-yellow); }
+:root[data-theme="graffiti"] .pc-evidence > div { border:2px solid #858590; background:var(--street-ink); }
+:root[data-theme="graffiti"] .pc-evidence h5 { color:var(--street-cyan); }
+:root[data-theme="graffiti"] .pc-evidence blockquote { font-size:14px; }
+:root[data-theme="graffiti"] .pc-clarified { border-color:var(--street-yellow); }
+:root[data-theme="graffiti"] :is(.pc-work-icon,.pc-work-placeholder) { color:var(--street-ink); background:var(--street-yellow); border:2px solid var(--street-chalk); border-radius:7px; }
+:root[data-theme="graffiti"] .pc-work-header h1 { font-family:"Space Grotesk",system-ui,sans-serif; font-size:29px; font-weight:700; text-transform:none; }
+:root[data-theme="graffiti"] .mini-item { padding:14px 12px; border-color:#858590; gap:13px; min-height:78px; }
+:root[data-theme="graffiti"] .mini-item strong { font-family:"Space Grotesk",sans-serif; font-size:15px; }
+:root[data-theme="graffiti"] .mini-item small { line-height:1.5; }
+:root[data-theme="graffiti"] :is(.pill,.doc-row) { min-height:48px; }
+:root[data-theme="graffiti"] :is(.back,.tour-launch,.tour-replay,.intake-text-button,.pc-text-button,.pc-history summary,.pc-sample summary,.case-secondary summary) { min-height:48px; }
+:root[data-theme="graffiti"] .pc-preview-price { font-family:"Space Grotesk",sans-serif; color:var(--street-yellow); }
+:root[data-theme="graffiti"] .bottom-nav { background:var(--surface); border-top:2px solid #858590; gap:5px; padding-top:10px; backdrop-filter:none; }
+:root[data-theme="graffiti"] .nav-item { min-height:58px; border:2px solid transparent; border-radius:8px; color:#d4d4dc; }
+:root[data-theme="graffiti"] .nav-item.active { background:var(--street-cyan); color:var(--street-ink); border-color:var(--street-chalk); font-weight:800; box-shadow:2px 2px 0 var(--street-pink); }
+:root[data-theme="graffiti"] .rd-intro { border:2px solid var(--street-chalk); border-radius:15px; box-shadow:5px 5px 0 var(--street-cyan); font-family:"Plus Jakarta Sans",system-ui,sans-serif; }
+:root[data-theme="graffiti"] .rd-intro-header { border-bottom:2px solid #383842; padding-block:16px; }
+:root[data-theme="graffiti"] .rd-intro-close { border:2px solid #b8b8c2; border-radius:8px; min-width:48px; height:48px; background:var(--street-ink); }
+:root[data-theme="graffiti"] .rd-intro-dots li { border-radius:1px; background:#858590; }
+:root[data-theme="graffiti"] .rd-intro-dots li[aria-current] { background:var(--street-cyan); }
+:root[data-theme="graffiti"] .rd-intro h2 { font-size:clamp(1.7rem,6.7vw,2.15rem); line-height:1.15; }
+:root[data-theme="graffiti"] :is(.rd-intro-path,.rd-intro-prep > div,.rd-intro-callout) { border:2px solid #858590; border-radius:10px; background:var(--street-ink); }
+:root[data-theme="graffiti"] .rd-intro-path b { border-radius:5px; background:var(--street-yellow); color:var(--street-ink); }
+:root[data-theme="graffiti"] .rd-intro-choice { border:2px solid #858590; border-radius:10px; background:var(--street-ink); }
+:root[data-theme="graffiti"] .rd-intro-choice-primary { border-color:var(--street-cyan); box-shadow:3px 3px 0 var(--street-pink); }
+:root[data-theme="graffiti"] .rd-choice-symbol { border-radius:6px; }
+:root[data-theme="graffiti"] .rd-intro-footer { border-top:2px solid #858590; }
+:root[data-theme="graffiti"] :is(.rd-intro-back,.rd-intro-skip) { min-height:48px; }
+:root[data-theme="graffiti"] .rd-guide-card { background:var(--surface); border:2px solid var(--street-chalk); border-top:5px solid var(--street-cyan); border-radius:12px; box-shadow:4px 4px 0 var(--street-pink); font-family:"Plus Jakarta Sans",system-ui,sans-serif; }
+:root[data-theme="graffiti"] .rd-guide-progress { color:var(--street-yellow); }
+:root[data-theme="graffiti"] :is(.rd-guide-controls button,.rd-guide-continue) { min-height:48px; border:2px solid #b8b8c2; border-radius:8px; font-size:12px; }
+:root[data-theme="graffiti"] .rd-guide-continue { border-color:var(--street-chalk); }
+:root[data-theme="graffiti"] .rd-guide-ring { border:3px solid var(--street-yellow); box-shadow:0 0 0 2px var(--street-ink); }
+:root[data-theme="graffiti"] .tour-card { border:2px solid var(--street-chalk); border-radius:12px; box-shadow:4px 4px 0 var(--street-cyan); }
+:root[data-theme="graffiti"] .tour-card h2 { font-family:"Space Grotesk",system-ui,sans-serif; font-weight:700; }
+:root[data-theme="graffiti"] .tour-card button { min-height:48px; }
+@media(max-width:360px) {
+  :root[data-theme="graffiti"] .page-pad { padding-inline:18px; }
+  :root[data-theme="graffiti"] .topbar { padding-inline:18px; }
+  :root[data-theme="graffiti"] .surface { padding:17px; }
+  :root[data-theme="graffiti"] .rd-learn-card { padding-top:35px; }
+  :root[data-theme="graffiti"] .pc-progress { gap:5px; }
+  :root[data-theme="graffiti"] .pc-progress li { font-size:10px; }
+  :root[data-theme="graffiti"] .rd-guide-compact .rd-guide-card { max-height:54dvh; }
+}
+@media(prefers-reduced-motion:reduce) {
+  :root[data-theme="graffiti"] *, :root[data-theme="graffiti"] *::before, :root[data-theme="graffiti"] *::after { transition:none!important; animation:none!important; scroll-behavior:auto!important; }
+}
+@media(forced-colors:active) {
+  :root[data-theme="graffiti"] .rd-learn-card::before,
+  :root[data-theme="graffiti"] .rd-desk-intro h1 em::after { display:none; }
+  :root[data-theme="graffiti"] :is(.button,.nav-item.active,.rd-guide-card,.rd-intro) { box-shadow:none; border-color:ButtonText; }
+}

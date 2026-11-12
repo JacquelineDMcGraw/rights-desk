@@ -1,5 +1,7 @@
 import { STATES, TERRITORIES, WORK_TYPES, USE_CHANNELS, GUIDE_LINKS, guideFor } from './rights-guide.js';
 import { renderCaseOffers } from './offers.js';
+import { permissionCaseTitle } from './permission-changes.js';
+import { renderPermissionHelp } from './permission-help.js';
 
 const esc = (value = '') => String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[char]);
 const fromList = (list, value) => list.find(([id]) => id === value)?.[1] || value || 'Not specified';
@@ -33,13 +35,40 @@ export function renderCaseEditor(state, item) {
   return `<section class="page-title page-pad"><button type="button" class="back" data-cancel-case-edit>← Back to case</button><div class="eyebrow">Your case, at your pace</div><h1>Add what<br/><em>you know.</em></h1><p class="lede">You can revisit any answer. Save when you are ready, or keep your draft changes for later.</p></section><section class="page-pad form-section"><div class="intake-fixed-work"><img src="${localUrl(item.previewUrl)}" alt="Reference for ${esc(item.title)}"/><div><strong>${esc(item.title)}</strong><p class="helper">This reference and its fingerprint identify the work in this case. Update the details below whenever you learn more.</p></div></div>${caseForm(true)}</section>`;
 }
 
+function deskCaseButton(item) {
+  const kind = item.caseType === 'permission-review' ? 'Permission review' : 'Evidence case';
+  const paid = item.offers?.some(offer => offer.status === 'PAID') ? ' · Paid record' : '';
+  const description = item.practice ? 'Permission review · preview only' : `${fromList(WORK_TYPES,item.workType)} · ${kind}${paid}`;
+  const preview = item.previewUrl ? `<img src="${localUrl(item.previewUrl)}" alt=""/>` : '<span class="pc-work-placeholder" aria-hidden="true">↗</span>';
+  return `<button type="button" class="mini-item" data-case="${esc(item.id)}">${preview}<span><strong>${esc(permissionCaseTitle(item))}</strong><small>${esc(description)}</small></span><span class="arrow" aria-hidden="true">›</span></button>`;
+}
+
 export function renderProtect(state) {
-  return `<section class="page-title page-pad"><div class="eyebrow">Rights protection</div><h1>Keep proof.<br/><em>Find a path.</em></h1><p class="lede">Compare a work with named public collections, keep your creation evidence together, and explore U.S. next steps.</p><button type="button" class="tour-launch" data-start-case-tour="create">Take the first-case tour <span aria-hidden="true">↗</span></button></section>
-    <section class="page-pad form-section"><div class="surface why-card"><div class="eyebrow">Why this matters now</div><h2 class="serif">A changing image economy.</h2><p>Getty Images Holdings filed a prepackaged Chapter 11 case on October 21, 2026. Its own reports also identify generative AI as a risk to licensed content. The filing describes a financial restructuring; it does not say AI caused it.</p><a href="https://www.sec.gov/Archives/edgar/data/1898496/000121390026111193/ea0309225-8k_getty.htm" target="_blank" rel="noopener noreferrer">Read Getty’s SEC filing ↗</a></div>
-      <div class="section-heading"><h2>Private cases</h2><small>${state.cases.length} saved</small></div>
-      ${state.cases.length ? `<div class="mini-list">${state.cases.map(item => `<button type="button" class="mini-item" data-case="${esc(item.id)}"><img src="${localUrl(item.previewUrl)}" alt=""/><span><strong>${esc(item.title)}</strong><small>${esc(fromList(WORK_TYPES,item.workType))} · ${esc(item.jurisdiction)} · ${item.search?.matches?.length || 0} candidate matches</small></span><span class="arrow">›</span></button>`).join('')}</div>` : `<div class="empty-state"><div class="empty-icon">⌕</div><h2>Start with the work</h2><p>A private case keeps the reference image, public search results, and your supporting records in one place.</p></div>`}
-      <div class="section-heading"><h2>Start a case</h2></div>${!state.cases.length || state.showCaseForm ? caseForm() : `<button type="button" class="button dark full" data-new-case="true">Create a private case →</button>`}
-      <p class="helper" style="margin-top:15px">Rights Desk searches only the sources named in each report. A missing result is not proof that a work is unlicensed, unprotected, or unused.</p></section>`;
+  const start = state.permissionChanges.renderStart();
+  const noteEntry = window.rightsDeskNativeHome === true
+    ? '<a class="mini-item ip-notes-entry" href="rightsdesk://ip-notes"><span class="pc-work-placeholder" aria-hidden="true">✎</span><span><strong>IP notes</strong><small>Import, transcribe, and save voice notes on this iPhone.</small></span><span class="arrow" aria-hidden="true">›</span></a>'
+    : '<button type="button" class="mini-item ip-notes-entry" data-tab="ip-notes"><span class="pc-work-placeholder" aria-hidden="true">✎</span><span><strong>IP notes</strong><small>Save a voice recording or written note for a campaign.</small></span><span class="arrow" aria-hidden="true">›</span></button>';
+  const archivedCases = state.cases.filter(item => state.archivedDeskCases?.has(item.id));
+  const activeCases = state.cases.filter(item => !state.archivedDeskCases?.has(item.id));
+  const hasCases = activeCases.length > 0;
+  const hasNewDraft = Boolean(state.permissionChanges.newCase.title || state.permissionChanges.newCase.step);
+  const saved = state.cases.length ? `<div class="section-heading"><h2 id="private-desk-heading" tabindex="-1">Your private desk</h2><small>${activeCases.length} saved</small></div>
+    ${hasCases ? `<button type="button" class="pc-text-button" data-clear-private-desk>Clear desk</button><div class="mini-list">${activeCases.map(deskCaseButton).join('')}</div>` : ''}` : '';
+  const archive = archivedCases.length ? `<details class="pc-history" id="private-desk-archive"${state.showDeskArchive ? ' open' : ''}>
+    <summary>Archived cases (${archivedCases.length})</summary>
+    <button type="button" class="pc-text-button" data-restore-private-desk>Restore all</button>
+    <div class="mini-list">${archivedCases.map(item => `<div>${deskCaseButton(item)}<button type="button" class="pc-text-button" data-restore-desk-case="${esc(item.id)}" aria-label="Restore ${esc(permissionCaseTitle(item))} to desk">Restore to desk</button></div>`).join('')}</div>
+  </details>` : '';
+  return `<section class="page-title page-pad rd-desk-intro"><div class="eyebrow">Permission, at your pace</div><h1 id="desk-home-heading" tabindex="-1">Your work.<br/><em>Your terms.</em></h1><p class="lede">When someone asks to use your work in a new way, compare their request with what you’ve already agreed to. Get legal or technical help if you need it. When you’re ready, approve the terms you’re comfortable with and share a link so they can pay through PayPal.</p></section>
+    <section class="page-pad form-section"><div class="rd-learn-card surface"><div class="eyebrow">Permission changes</div><h2 class="serif">Review a proposed use.</h2><p class="helper">Bring the existing agreement and the request. You can work through the details one at a time.</p><div class="rd-learn-actions"><button type="button" class="button dark full" data-start-own-review>Start a permission review →</button><button type="button" class="button outline full" data-open-onboarding>How Rights Desk works</button></div></div>
+      ${noteEntry}
+      ${saved}${hasCases ? `<details class="pc-history" id="start-own-review" ${hasNewDraft ? 'open' : ''}><summary>Start another review</summary>${start}</details>` : start}
+      ${!hasCases ? `<div class="empty-state"><h2>Start with what you know.</h2><p>You will need the permission already recorded and the proposed use. You can save unfinished answers and return later.</p></div>` : ''}
+      ${archive}
+      ${renderPermissionHelp()}
+      <details class="pc-history"><summary>Need to document possible misuse?</summary><p class="helper">You can also open an evidence case with a reference image, supporting records, named public collection search, and U.S. rights starting points.</p><button type="button" class="tour-launch" data-start-case-tour="create">Take the evidence-case tour ↗</button><div class="section-heading"><h2>Start an evidence case</h2></div>${caseForm()}<p class="helper pc-space">Search covers only the sources named in each report. A missing result does not decide ownership, permission, or infringement.</p></details>
+      <details class="pc-history"><summary>Why creator control matters</summary><div class="surface why-card"><div class="eyebrow">A changing image economy</div><p>Getty Images Holdings filed a prepackaged Chapter 11 case on October 21, 2026. Its reports also identify generative AI as a risk to licensed content. The filing describes a financial restructuring; it does not say AI caused it.</p><a href="https://www.sec.gov/Archives/edgar/data/1898496/000121390026111193/ea0309225-8k_getty.htm" target="_blank" rel="noopener noreferrer">Read Getty’s SEC filing ↗</a></div></details>
+    </section>`;
 }
 
 function matchCard(match, reference) {
@@ -74,10 +103,14 @@ function searchSection(item, state) {
 
 function documentsSection(item, state, guide) {
   const docs = state.caseDocuments || [];
+  const permissionCase = item.caseType === 'permission-review';
+  const stage = permissionCase ? state.permissionChanges.getGuideState(item.id).stage : '';
+  const sourceStep = { permission:'Existing permission', request:'Proposed use' }[stage];
   return `<section class="page-pad form-section"><div class="section-heading"><h2>Document your rights</h2><small>${docs.length} files</small></div>
-    <div class="surface"><p class="evidence-summary">If the search finds nothing or a result is uncertain, your own records matter. For ${esc(fromList(WORK_TYPES,item.workType).toLowerCase())}, gather:</p><p class="doc-prompt">${esc(guide.workEvidence)}</p><p class="helper">Also keep assignments, releases, contracts, licenses granted, correspondence, and registration or application records. A public record search can miss unregistered or recent works.</p>
-      <form id="document-form" class="form-stack" style="margin-top:16px"><div class="field"><label for="case-document">Add a private supporting file</label><input id="case-document" name="document" type="file" accept="application/pdf,image/jpeg,image/png" required/><small>PDF, JPEG, or PNG, up to 10 MB. This file is available only in this browser session.</small></div><button type="submit" class="button light full" ${state.uploadingDocument ? 'disabled' : ''}>${state.uploadingDocument ? 'Saving document…' : 'Save supporting file'}</button></form>
+    <div class="surface"><p class="evidence-summary">${permissionCase ? 'Keep the records supporting your permission and the changes you are considering. Useful records include:' : `If the search finds nothing or a result is uncertain, your own records matter. For ${esc(fromList(WORK_TYPES,item.workType).toLowerCase())}, gather:`}</p><p class="doc-prompt">${esc(guide.workEvidence)}</p>${permissionCase ? '<p class="helper pc-space">Pull contract wording into Existing permission, or bring a studio email or brief into Proposed use.</p>' : ''}<p class="helper">Also keep assignments, releases, contracts, licenses granted, correspondence, and registration or application records. A public record search can miss unregistered or recent works.</p>
+      <form id="document-form" class="form-stack" style="margin-top:16px"><div class="field"><label for="case-document">Add a private supporting file</label><input id="case-document" name="document" type="file" accept="application/pdf,image/jpeg,image/png${permissionCase ? ',.eml,.txt' : ''}" required/><small>${permissionCase ? 'PDF, JPEG, PNG, EML, or TXT' : 'PDF, JPEG, or PNG'}, up to 10 MB. This file is available only in this browser session.</small></div><button type="submit" class="button light full" ${state.uploadingDocument ? 'disabled' : ''}>${state.uploadingDocument ? 'Saving document…' : 'Save supporting file'}</button></form>
       ${docs.length ? `<div class="doc-list">${docs.map(doc => { const download = localUrl(doc.downloadUrl || `/api/cases/${encodeURIComponent(item.id)}/documents/${encodeURIComponent(doc.id)}/download`); return `<a href="${download}" class="doc-row" download><span>▣</span><span>${esc(doc.name || 'Supporting file')}<small>${doc.size ? `${Math.round(doc.size / 1024)} KB · ` : ''}${esc(doc.uploadedAt ? new Date(doc.uploadedAt).toLocaleDateString() : '')}</small></span><strong>↓</strong></a>`; }).join('')}</div>` : ''}
+      ${sourceStep && docs.length ? `<button type="button" class="button outline full pc-space" data-return-to-source>Go to ${sourceStep}</button>` : ''}
     </div></section>`;
 }
 
@@ -99,9 +132,14 @@ function guideSection(item, guide) {
     <p class="helper" style="margin-top:13px">Check ownership, existing permission, exceptions, and exact use before making a claim. This guide is a starting path; it does not decide your legal rights.</p><button type="button" class="button outline full" data-export-case="true" style="margin-top:14px">Download case summary ↓</button></section>`;
 }
 
-export function renderCaseDetail(state, item) {
-  const guide = guideFor(item);
-  return `<section class="page-pad" style="padding-top:17px"><div class="case-toolbar"><button type="button" class="back" data-back-case="true">← Back to private cases</button><button type="button" class="tour-replay" data-start-case-tour="collect">Tour this case ↗</button></div><div class="private-image"><img src="${localUrl(item.previewUrl)}" alt="Reference for ${esc(item.title)}"/><span>PRIVATE CASE</span></div></section>
-    <section class="detail-body"><div class="eyebrow">${esc(fromList(WORK_TYPES,item.workType))} · ${esc(fromList(USE_CHANNELS,item.useChannel))}</div><h1>${esc(item.title)}</h1><p class="detail-meta">Possible use in ${esc(item.jurisdiction)} · opened ${esc(new Date(item.createdAt).toLocaleDateString())}</p>${item.story ? `<p class="detail-story">${esc(item.story)}</p>` : ''}${item.suspectedUrl && httpsUrl(item.suspectedUrl) ? `<a class="case-link" href="${httpsUrl(item.suspectedUrl)}" target="_blank" rel="noopener noreferrer">Open reported use ↗</a>` : ''}${item.previewSha256 ? `<p class="hash-line"><strong>Reference SHA-256</strong> ${esc(item.previewSha256)}</p>` : ''}<button type="button" class="button outline full" data-edit-case style="margin-top:16px">Update case details →</button><p class="helper" style="margin-top:8px">Return to anything you skipped, add a registration number, or update your notes.</p></section>
-    ${searchSection(item,state)}${documentsSection(item,state,guide)}${renderCaseOffers(state,item)}${guideSection(item,guide)}<p class="footer-note page-pad">Rights Desk · Case files are stored on this local machine</p>`;
+export function renderCaseDetail(state, item, { supportingRecordsOpen = false } = {}) {
+  const permissionCase = item.caseType === 'permission-review';
+  const guide = permissionCase ? null : guideFor(item);
+  const existingDetails = permissionCase ? '' : `<section class="page-pad"><div class="private-image"><img src="${localUrl(item.previewUrl)}" alt="Reference for ${esc(item.title)}"/><span>PRIVATE CASE</span></div></section><section class="detail-body"><p class="detail-meta">Possible use in ${esc(item.jurisdiction)} · opened ${esc(new Date(item.createdAt).toLocaleDateString())}</p>${item.story ? `<p class="detail-story">${esc(item.story)}</p>` : ''}${item.suspectedUrl && httpsUrl(item.suspectedUrl) ? `<a class="case-link" href="${httpsUrl(item.suspectedUrl)}" target="_blank" rel="noopener noreferrer">Open reported use ↗</a>` : ''}${item.previewSha256 ? `<p class="hash-line"><strong>Reference SHA-256</strong> ${esc(item.previewSha256)}</p>` : ''}<button type="button" class="button outline full pc-space" data-edit-case>Update case details →</button></section>`;
+  return `<section class="page-pad" style="padding-top:17px"><div class="case-toolbar"><button type="button" class="back" data-back-case="true">← Back to your desk</button>${permissionCase ? `<span class="eyebrow">Private review</span>` : '<button type="button" class="tour-replay" data-start-case-tour="collect">Tour this case ↗</button>'}</div></section>
+    <section class="detail-body pc-work-header"><span class="pc-work-icon" aria-hidden="true">↗</span><div><div class="eyebrow">${esc(fromList(WORK_TYPES,item.workType))}</div><h1>${esc(permissionCaseTitle(item))}</h1><p class="helper pc-space">${item.practice ? 'Existing permission → proposed use → reviewed terms' : 'Existing permission → reviewed change → verified payment'}</p></div></section>
+    ${permissionCase && state.permissionChanges.getGuideState(item.id).stage !== 'practice-complete' ? `<div class="page-pad pc-actions"><button type="button" class="tour-launch" data-resume-permission-guide="${esc(item.id)}">Step-by-step help ↗</button>${item.practice ? '' : '<button type="button" class="tour-launch" data-attach-original-contract aria-controls="permission-supporting-records">Attach the original contract</button>'}</div>` : ''}
+    ${item.practice ? '' : `<div class="page-pad"><button type="button" class="tour-launch" data-case-ip-notes="${esc(item.id)}">IP notes for this campaign ↗</button></div>`}
+    ${state.permissionChanges.render(item, { documents:state.caseDocuments || [] })}${item.practice ? '' : renderCaseOffers(state,item)}
+    ${item.practice ? '' : `<details class="case-secondary"${permissionCase ? ` id="permission-supporting-records" data-case-id="${esc(item.id)}"${supportingRecordsOpen ? ' open' : ''}` : ''}><summary>${permissionCase ? 'Supporting records' : 'Evidence, search & U.S. rights guide'}</summary>${existingDetails}${permissionCase ? '' : searchSection(item,state)}${documentsSection(item,state,guide || {workEvidence:'Keep the original agreement, relevant correspondence, and any records showing that you can grant the proposed permission.'})}${permissionCase ? '' : guideSection(item,guide)}</details>`}<p class="footer-note page-pad">Rights Desk · Your private records stay on this local machine</p>`;
 }

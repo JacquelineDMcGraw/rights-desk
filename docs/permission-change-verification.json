@@ -1,0 +1,23 @@
+{
+  "checkedAt": "2026-11-06T04:47:02.492Z",
+  "mode": "sandbox",
+  "title": "Harbor Study — permission change demo",
+  "aiMode": "ollama",
+  "caseStatus": "PAID",
+  "orderStatus": "COMPLETED",
+  "amount": "25.00",
+  "currency": "USD",
+  "paypalCaptureId": "52A91318SB683445Y",
+  "licenseRecordId": "license_fd5f71a5-cfd0-4dbb-b73c-8bce973feb95",
+  "acceptedTermsVersion": "rights-desk-permission-change-v1",
+  "approvedChange": {
+    "purpose": "Paid advertising on Instagram",
+    "channels": "Paid Instagram advertisements",
+    "duration": "Six months from payment confirmation",
+    "territory": "United States only",
+    "conditions": "Attribution: Demo Creator. Fictional example for PayPal Sandbox testing only."
+  },
+  "changeHash": "55e467cf33ed0e1dba7d166a7465ba6871113fb5b65e780f3be84fa94b7ae31e",
+  "identicalOfferOrderReceiptSnapshots": true,
+  "issuedAt": "2026-11-06T04:46:15.913Z"
+}

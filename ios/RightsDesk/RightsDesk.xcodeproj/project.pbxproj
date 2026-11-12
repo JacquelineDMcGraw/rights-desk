@@ -1,0 +1,197 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {};
+	objectVersion = 60;
+	objects = {
+		11A7AFAB1100000000000001 /* RightsDeskApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11A7AFAB1200000000000001 /* RightsDeskApp.swift */; };
+		11A7AFAB1100000000000002 /* DeskViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11A7AFAB1200000000000002 /* DeskViewController.swift */; };
+		11A7AFAB1100000000000003 /* PrivateDeskStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11A7AFAB1200000000000003 /* PrivateDeskStore.swift */; };
+		11A7AFAB1100000000000004 /* PhoneSpeech.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11A7AFAB1200000000000004 /* PhoneSpeech.swift */; };
+		11A7AFAB1100000000000005 /* mobile in Resources */ = {isa = PBXBuildFile; fileRef = 11A7AFAB1200000000000005 /* mobile */; };
+		11A7AFAB1100000000000008 /* styles.css in Resources */ = {isa = PBXBuildFile; fileRef = 11A7AFAB1200000000000008 /* styles.css */; };
+		11A7AFAB1100000000000009 /* themes.css in Resources */ = {isa = PBXBuildFile; fileRef = 11A7AFAB1200000000000009 /* themes.css */; };
+		11A7AFAB110000000000000A /* graffiti.css in Resources */ = {isa = PBXBuildFile; fileRef = 11A7AFAB120000000000000A /* graffiti.css */; };
+		11A7AFAB110000000000000B /* ip-notes.css in Resources */ = {isa = PBXBuildFile; fileRef = 11A7AFAB120000000000000B /* ip-notes.css */; };
+		11A7AFAB110000000000000C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 11A7AFAB120000000000000C /* Assets.xcassets */; };
+
+		11A7AFAB1200000000000001 /* RightsDeskApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RightsDeskApp.swift; sourceTree = "<group>"; };
+		11A7AFAB1200000000000002 /* DeskViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeskViewController.swift; sourceTree = "<group>"; };
+		11A7AFAB1200000000000003 /* PrivateDeskStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivateDeskStore.swift; sourceTree = "<group>"; };
+		11A7AFAB1200000000000004 /* PhoneSpeech.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneSpeech.swift; sourceTree = "<group>"; };
+		11A7AFAB1200000000000005 /* mobile */ = {isa = PBXFileReference; lastKnownFileType = folder; name = mobile; path = "../../public/mobile"; sourceTree = SOURCE_ROOT; };
+		11A7AFAB1200000000000006 /* RightsDesk.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; path = RightsDesk.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		11A7AFAB1200000000000007 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		11A7AFAB1200000000000008 /* styles.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = styles.css; path = "../../public/styles.css"; sourceTree = SOURCE_ROOT; };
+		11A7AFAB1200000000000009 /* themes.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = themes.css; path = "../../public/themes.css"; sourceTree = SOURCE_ROOT; };
+		11A7AFAB120000000000000A /* graffiti.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = graffiti.css; path = "../../public/graffiti.css"; sourceTree = SOURCE_ROOT; };
+		11A7AFAB120000000000000B /* ip-notes.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = "ip-notes.css"; path = "../../public/ip-notes.css"; sourceTree = SOURCE_ROOT; };
+		11A7AFAB120000000000000C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+
+		11A7AFAB1300000000000001 /* Main group */ = {
+			isa = PBXGroup;
+			children = (
+				11A7AFAB1200000000000001 /* RightsDeskApp.swift */,
+				11A7AFAB1200000000000002 /* DeskViewController.swift */,
+				11A7AFAB1200000000000003 /* PrivateDeskStore.swift */,
+				11A7AFAB1200000000000004 /* PhoneSpeech.swift */,
+				11A7AFAB1200000000000007 /* Info.plist */,
+				11A7AFAB120000000000000C /* Assets.xcassets */,
+				11A7AFAB1300000000000003 /* Bundled web assets */,
+				11A7AFAB1300000000000002 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		11A7AFAB1300000000000002 /* Products */ = {
+			isa = PBXGroup;
+			children = (11A7AFAB1200000000000006 /* RightsDesk.app */);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		11A7AFAB1300000000000003 /* Bundled web assets */ = {
+			isa = PBXGroup;
+			children = (
+				11A7AFAB1200000000000005 /* mobile */,
+				11A7AFAB1200000000000008 /* styles.css */,
+				11A7AFAB1200000000000009 /* themes.css */,
+				11A7AFAB120000000000000A /* graffiti.css */,
+				11A7AFAB120000000000000B /* ip-notes.css */,
+			);
+			name = "Bundled web assets";
+			sourceTree = "<group>";
+		};
+
+		11A7AFAB1400000000000001 /* RightsDesk */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 11A7AFAB1800000000000002;
+			buildPhases = (
+				11A7AFAB1600000000000001 /* Sources */,
+				11A7AFAB1600000000000002 /* Resources */,
+			);
+			buildRules = ();
+			dependencies = ();
+			name = RightsDesk;
+			productName = RightsDesk;
+			productReference = 11A7AFAB1200000000000006 /* RightsDesk.app */;
+			productType = "com.apple.product-type.application";
+		};
+
+		11A7AFAB1500000000000001 /* Project */ = {
+			isa = PBXProject;
+			attributes = {LastUpgradeCheck = 2600;};
+			buildConfigurationList = 11A7AFAB1800000000000001;
+			compatibilityVersion = "Xcode 15.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (en, Base);
+			mainGroup = 11A7AFAB1300000000000001;
+			productRefGroup = 11A7AFAB1300000000000002 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (11A7AFAB1400000000000001 /* RightsDesk */);
+		};
+
+		11A7AFAB1600000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				11A7AFAB1100000000000001 /* RightsDeskApp.swift in Sources */,
+				11A7AFAB1100000000000002 /* DeskViewController.swift in Sources */,
+				11A7AFAB1100000000000003 /* PrivateDeskStore.swift in Sources */,
+				11A7AFAB1100000000000004 /* PhoneSpeech.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		11A7AFAB1600000000000002 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				11A7AFAB1100000000000005 /* mobile in Resources */,
+				11A7AFAB1100000000000008 /* styles.css in Resources */,
+				11A7AFAB1100000000000009 /* themes.css in Resources */,
+				11A7AFAB110000000000000A /* graffiti.css in Resources */,
+				11A7AFAB110000000000000B /* ip-notes.css in Resources */,
+				11A7AFAB110000000000000C /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+
+		11A7AFAB1700000000000001 /* Project Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		11A7AFAB1700000000000002 /* Project Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		11A7AFAB1700000000000003 /* App Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Rights Desk";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.rightsdesk.mobile;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		11A7AFAB1700000000000004 /* App Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Rights Desk";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.rightsdesk.mobile;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+
+		11A7AFAB1800000000000001 /* Project configurations */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (11A7AFAB1700000000000001, 11A7AFAB1700000000000002);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		11A7AFAB1800000000000002 /* App configurations */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (11A7AFAB1700000000000003, 11A7AFAB1700000000000004);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+	};
+	rootObject = 11A7AFAB1500000000000001 /* Project */;
+}

@@ -38,7 +38,7 @@ await writeFile(join(dataDir, 'store.json'), JSON.stringify({
   listings:{},quotes:{},orders:{},licenses:{},
 }));
 const server = spawn(process.execPath, ['--import', fileURLToPath(new URL('./paypal-mock.mjs', import.meta.url)), fileURLToPath(new URL('../server.mjs', import.meta.url))], {
-  cwd:fileURLToPath(root),env:{...process.env,DATA_DIR:dataDir,PORT:String(port),PAYPAL_CLIENT_ID:'test-only-client',PAYPAL_CLIENT_SECRET:'test-only-secret',OLLAMA_URL:'http://127.0.0.1:1'},stdio:'pipe',
+  cwd:fileURLToPath(root),env:{...process.env,RIGHTS_DESK_KEYCHAIN:'0',DATA_DIR:dataDir,PORT:String(port),PAYPAL_CLIENT_ID:'test-only-client',PAYPAL_CLIENT_SECRET:'test-only-secret',OLLAMA_URL:'http://127.0.0.1:1'},stdio:'pipe',
 });
 let output = '';
 server.stderr.on('data', chunk => { output += chunk; });

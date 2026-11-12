@@ -14,7 +14,7 @@ const clockPath = join(dataDir, 'clock.txt');
 await writeFile(clockPath, '0');
 const server = spawn(process.execPath, ['--import', fileURLToPath(new URL('./paypal-mock.mjs', import.meta.url)), fileURLToPath(new URL('../server.mjs', import.meta.url))], {
   cwd: fileURLToPath(root),
-  env: { ...process.env, DATA_DIR: dataDir, PORT: String(port), PAYPAL_CLIENT_ID: 'test-only-client', PAYPAL_CLIENT_SECRET: 'test-only-secret', OLLAMA_URL: 'http://127.0.0.1:1', RIGHTS_DESK_TEST_CLOCK_PATH: clockPath },
+  env: { ...process.env, RIGHTS_DESK_KEYCHAIN: '0', DATA_DIR: dataDir, PORT: String(port), PAYPAL_CLIENT_ID: 'test-only-client', PAYPAL_CLIENT_SECRET: 'test-only-secret', OLLAMA_URL: 'http://127.0.0.1:1', RIGHTS_DESK_TEST_CLOCK_PATH: clockPath },
   stdio: 'pipe',
 });
 let serverOutput = '';
@@ -158,7 +158,7 @@ try {
   const disabledPort = port + 1500;
   const disabled = spawn(process.execPath, [fileURLToPath(new URL('../server.mjs', import.meta.url))], {
     cwd: fileURLToPath(root),
-    env: {...process.env, PORT:String(disabledPort), DATA_DIR:join(dataDir,'without-paypal'), PAYPAL_CLIENT_ID:'', PAYPAL_CLIENT_SECRET:'', OLLAMA_URL:'http://127.0.0.1:1'},
+    env: {...process.env, RIGHTS_DESK_KEYCHAIN:'0', PORT:String(disabledPort), DATA_DIR:join(dataDir,'without-paypal'), PAYPAL_CLIENT_ID:'', PAYPAL_CLIENT_SECRET:'', OLLAMA_URL:'http://127.0.0.1:1'},
     stdio:'pipe',
   });
   try {

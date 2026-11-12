@@ -1,0 +1,115 @@
+{
+  "verifiedAt": "2026-11-06T04:35:13.393Z",
+  "model": "gemma3:4b",
+  "firstComparison": {
+    "aiMode": "ollama",
+    "summary": "2 possible scope changes. 2 source comparisons remain unclear. Answer the missing scope questions at your pace.",
+    "findings": [
+      {
+        "dimension": "purpose",
+        "label": "Purpose",
+        "assessment": "changed",
+        "baselineQuote": "Paid advertising, social media advertising, and merchandise are excluded.",
+        "requestQuote": "paid Instagram advertisements for our next campaign.",
+        "explanation": "These passages appear to describe different scope. Review the proposed change before offering permission."
+      },
+      {
+        "dimension": "channels",
+        "label": "Channels",
+        "assessment": "changed",
+        "baselineQuote": "on its own website",
+        "requestQuote": "paid Instagram advertisements",
+        "explanation": "These passages appear to describe different scope. Review the proposed change before offering permission."
+      },
+      {
+        "dimension": "duration",
+        "label": "Duration",
+        "assessment": "unclear",
+        "baselineQuote": "for one year",
+        "requestQuote": null,
+        "explanation": "The supplied passages do not establish a clear comparison for this detail. Review the original record and clarify the proposed scope."
+      },
+      {
+        "dimension": "territory",
+        "label": "Territory",
+        "assessment": "unclear",
+        "baselineQuote": "in the United States",
+        "requestQuote": null,
+        "explanation": "The supplied passages do not establish a clear comparison for this detail. Review the original record and clarify the proposed scope."
+      }
+    ],
+    "proposedChange": {
+      "purpose": "Paid advertising",
+      "channels": "Paid Instagram advertisements",
+      "duration": null,
+      "territory": null
+    },
+    "questions": [
+      {
+        "id": "duration",
+        "prompt": "How long may the new use continue?",
+        "help": "Give a duration or dates, such as six months or through December 31. Nothing defaults to permanent permission."
+      },
+      {
+        "id": "territory",
+        "prompt": "Where may the new use be distributed?",
+        "help": "For example, Massachusetts, the United States, or worldwide. Record the intended distribution."
+      }
+    ],
+    "warnings": [
+      "A quoted passage for duration could not be found in its source. That comparison needs your review.",
+      "A quoted passage for territory could not be found in its source. That comparison needs your review."
+    ]
+  },
+  "clarifiedComparison": {
+    "aiMode": "ollama",
+    "summary": "2 possible scope changes. 2 source comparisons remain unclear. Review the proposed permission before setting an offer.",
+    "findings": [
+      {
+        "dimension": "purpose",
+        "label": "Purpose",
+        "assessment": "changed",
+        "baselineQuote": "Paid advertising, social media advertising, and merchandise are excluded.",
+        "requestQuote": "paid Instagram advertisements for our next campaign.",
+        "explanation": "These passages appear to describe different scope. Review the proposed change before offering permission. Your clarification sets the proposed scope for this detail."
+      },
+      {
+        "dimension": "channels",
+        "label": "Channels",
+        "assessment": "changed",
+        "baselineQuote": "on its own website",
+        "requestQuote": "paid Instagram advertisements",
+        "explanation": "These passages appear to describe different scope. Review the proposed change before offering permission. Your clarification sets the proposed scope for this detail."
+      },
+      {
+        "dimension": "duration",
+        "label": "Duration",
+        "assessment": "unclear",
+        "baselineQuote": "for one year",
+        "requestQuote": null,
+        "explanation": "The supplied passages do not establish a clear comparison for this detail. Review the original record and clarify the proposed scope. Your clarification sets the proposed scope for this detail."
+      },
+      {
+        "dimension": "territory",
+        "label": "Territory",
+        "assessment": "unclear",
+        "baselineQuote": "in the United States",
+        "requestQuote": null,
+        "explanation": "The supplied passages do not establish a clear comparison for this detail. Review the original record and clarify the proposed scope. Your clarification sets the proposed scope for this detail."
+      }
+    ],
+    "proposedChange": {
+      "purpose": "Paid advertising for Harbor Studio\u2019s next campaign",
+      "channels": "Instagram advertisements only",
+      "duration": "Six months from the payment confirmation date",
+      "territory": "United States only"
+    },
+    "questions": [],
+    "warnings": [
+      "A quoted passage for duration could not be found in its source. That comparison needs your review.",
+      "A quoted passage for territory could not be found in its source. That comparison needs your review."
+    ]
+  },
+  "elapsedMs": 20835,
+  "verification": "Actual local model comparison and explicit clarification preservation; payment is verified separately."
+}

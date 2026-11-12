@@ -21,7 +21,7 @@ body.settings-open {overflow:hidden;}
 .palette-selected {font-size:10px;color:var(--color-accent);visibility:hidden;}
 .palette-choice:has(input:checked) .palette-selected {visibility:visible;}
 .palette-description {display:block;font-size:11px;line-height:1.4;color:var(--text-muted);margin-top:3px;}
-.palette-swatches {display:flex;margin-top:10px;gap:4px;}
+.palette-swatches {display:flex;flex-wrap:wrap;margin-top:10px;gap:4px;}
 .palette-swatches > span {display:block;width:29px;height:12px;border-radius:99px;border:1px solid color-mix(in oklch,var(--text) 25%,transparent);}
 .settings-status {font-size:12px;line-height:1.5;color:var(--text-muted);min-height:36px;margin-top:14px;}
 .settings-footer {position:sticky;bottom:0;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 22px max(16px,env(safe-area-inset-bottom));background:var(--surface);border-top:var(--border) solid var(--border-color);}
@@ -30,3 +30,32 @@ body.settings-open {overflow:hidden;}
 .settings-done {border:var(--border) solid var(--color-primary);color:var(--color-primary-content);background:var(--color-primary);min-width:84px;}
 .settings-dialog button:focus-visible {outline:3px solid var(--focus);outline-offset:3px;}
 @media(max-width:360px) {.top-right .beta {display:none;}.settings-header {padding:18px 16px 12px;}.settings-content {padding:0 16px 12px;}.settings-footer {padding-left:16px;padding-right:16px;}.palette-choice {padding:11px;gap:9px;}}
+
+:root[data-theme="sky"] .settings-header h2 { font-family:"DM Sans",sans-serif; font-weight:700; }
+:root[data-theme="sky"] .settings-dialog { border-width:1px; }
+:root[data-theme="sky"] .palette-choice { border-width:1px; }
+:root[data-theme="sky"] .palette-choice:has(input:checked) { background:#e4f4fc; border-color:#176b9f; }
+:root[data-theme="sky"] .palette-choice input { accent-color:var(--sky-navy); }
+:root[data-theme="sky"] .settings-done { box-shadow:0 3px 0 #38b9d0; }
+
+:root[data-theme="graffiti"] .settings-trigger { min-width:48px; height:48px; background:var(--bg-concrete); color:var(--text-chalk); border:2px solid var(--text-chalk); border-radius:8px; box-shadow:3px 3px 0 var(--accent-magenta); }
+:root[data-theme="graffiti"] .settings-dialog { border:2px solid var(--text-chalk); border-radius:12px; box-shadow:6px 6px 0 var(--accent-cyan); }
+:root[data-theme="graffiti"] .settings-dialog::backdrop { background:#000000d9; backdrop-filter:none; }
+:root[data-theme="graffiti"] .settings-eyebrow { color:var(--accent-yellow); }
+:root[data-theme="graffiti"] .settings-header h2 { font-family:"Space Grotesk","DM Sans",sans-serif; font-weight:700; letter-spacing:-.025em; }
+:root[data-theme="graffiti"] .settings-close { min-width:48px; min-height:48px; border:2px solid var(--text-chalk); background:var(--bg-asphalt); color:var(--text-chalk); border-radius:8px; }
+:root[data-theme="graffiti"] .palette-choice { padding:14px; border:2px solid var(--color-base-300); border-radius:8px; background:var(--bg-concrete); }
+:root[data-theme="graffiti"] .palette-choice:has(input:checked) { border-color:var(--accent-cyan); background:var(--bg-asphalt); box-shadow:3px 3px 0 var(--accent-cyan); }
+:root[data-theme="graffiti"] .palette-selected { color:var(--accent-yellow); }
+:root[data-theme="graffiti"] .palette-choice input { width:22px; height:22px; accent-color:var(--accent-cyan); }
+:root[data-theme="graffiti"] .palette-swatches > span { width:27px; height:13px; border-radius:3px; border-color:#b8b8c2; }
+:root[data-theme="graffiti"] .settings-footer { border-top:2px solid var(--text-chalk); gap:14px; }
+:root[data-theme="graffiti"] .settings-footer button { min-height:48px; border-radius:8px; }
+:root[data-theme="graffiti"] .settings-reset { background:var(--bg-asphalt); color:var(--text-chalk); border:2px solid var(--text-chalk); }
+:root[data-theme="graffiti"] .settings-done { background:var(--accent-cyan); color:var(--bg-asphalt); border:2px solid var(--text-chalk); box-shadow:3px 3px 0 var(--accent-magenta); }
+:root[data-theme="graffiti"] .settings-dialog button:focus-visible,
+:root[data-theme="graffiti"] .palette-choice:focus-within { outline:3px solid var(--accent-yellow); outline-offset:3px; }
+@media(max-width:360px) {
+  :root[data-theme="graffiti"] .palette-choice { padding:11px; }
+  :root[data-theme="graffiti"] .settings-footer { gap:10px; }
+}

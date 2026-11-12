@@ -77,6 +77,30 @@ const COLLECT_STEPS = [
   },
 ];
 
+const NOTES_STEPS = [
+  {
+    selector: '#ip-note-audio',
+    title: 'Bring in a voice memo',
+    text: 'Record in Voice Memos on your Apple Watch. On your iPhone, open Watch Recordings, share the memo to Files, then choose the .m4a here. You can also write a note.',
+  },
+  {
+    selector: '#ip-note-campaign',
+    title: 'Pick a campaign when you know it',
+    text: 'Choose one of your private cases or Studio listings. If the campaign doesn’t exist yet, leave the note unassigned.',
+  },
+  {
+    selector: '#ip-note-save',
+    title: 'Save the note privately',
+    text: 'You can play the recording and change the campaign from IP Notes later. Only your browser session can open the note.',
+  },
+];
+
+const TOURS = {
+  create: { tab:'protect', title:'Create your first case', steps:CREATE_STEPS },
+  collect: { tab:'protect', title:'Collect your evidence', steps:COLLECT_STEPS },
+  notes: { tab:'ip-notes', title:'Save an IP note', steps:NOTES_STEPS },
+};
+
 function read(storage, key) {
   try { return storage.getItem(key); } catch { return null; }
 }
@@ -111,7 +135,7 @@ export class CaseTour {
 
   sync({ tab, activeCaseId, hasCases, loading, error }) {
     if (this.phase) {
-      const wrongPage = tab !== 'protect' || loading || error ||
+      const wrongPage = tab !== TOURS[this.phase].tab || loading || error ||
         (this.phase === 'create' && activeCaseId) || (this.phase === 'collect' && !activeCaseId);
       if (wrongPage) this.close({ clearPending: false, restoreFocus: false });
       else this.scheduleLayout(true);
@@ -139,6 +163,12 @@ export class CaseTour {
     return true;
   }
 
+  startNotes() {
+    if (!document.querySelector(NOTES_STEPS[0].selector)) return false;
+    this.open('notes');
+    return true;
+  }
+
   open(phase) {
     if (this.phase) this.close({ clearPending: false, restoreFocus: false });
     this.phase = phase;
@@ -161,11 +191,17 @@ export class CaseTour {
 
   renderStep() {
     if (!this.root || !this.phase) return;
-    const steps = this.phase === 'create' ? CREATE_STEPS : COLLECT_STEPS;
+    const { steps, title:phaseName } = TOURS[this.phase];
     const step = steps[this.index];
+    // Evidence tools may be inside an optional section in the permission desk.
+    // Reveal their section before measuring the spotlight target.
+    let ancestor = document.querySelector(step.selector)?.parentElement;
+    while (ancestor) {
+      if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+      ancestor = ancestor.parentElement;
+    }
     if (this.phase === 'create') document.dispatchEvent(new CustomEvent('case-intake-reveal', {detail:{selector:step.selector}}));
     const last = this.index === steps.length - 1;
-    const phaseName = this.phase === 'create' ? 'Create your first case' : 'Collect your evidence';
     this.root.innerHTML = `<div class="tour-fog tour-fog-top" aria-hidden="true"></div><div class="tour-fog tour-fog-left" aria-hidden="true"></div><div class="tour-fog tour-fog-right" aria-hidden="true"></div><div class="tour-fog tour-fog-bottom" aria-hidden="true"></div><div class="tour-window-shield" aria-hidden="true"></div><div class="tour-ring" aria-hidden="true"></div><div class="tour-card" role="dialog" aria-modal="true" aria-labelledby="tour-title" aria-describedby="tour-description"><div class="tour-progress"><span>${escapeHtml(phaseName)}</span><span>${this.index + 1} / ${steps.length}</span></div><h2 id="tour-title" tabindex="-1">${escapeHtml(step.title)}</h2><p id="tour-description">${escapeHtml(step.text)}</p><div class="tour-controls"><button type="button" class="tour-skip" data-tour-action="skip">Skip tour</button><div class="tour-actions">${this.index ? '<button type="button" class="tour-back" data-tour-action="back">Back</button>' : ''}<button type="button" class="tour-next" data-tour-action="next">${last ? this.phase === 'create' ? 'Start my case' : 'Done' : 'Next'} <span aria-hidden="true">→</span></button></div></div></div>`;
     this.scheduleLayout(true);
     requestAnimationFrame(() => this.root?.querySelector('#tour-title')?.focus({ preventScroll: true }));
@@ -179,7 +215,7 @@ export class CaseTour {
 
   layout(scrollTarget) {
     if (!this.root || !this.phase) return;
-    const steps = this.phase === 'create' ? CREATE_STEPS : COLLECT_STEPS;
+    const { steps } = TOURS[this.phase];
     const target = document.querySelector(steps[this.index].selector);
     const card = this.root.querySelector('.tour-card');
     if (!target || !card) return;
@@ -214,7 +250,7 @@ export class CaseTour {
     if (action === 'skip') this.close();
     if (action === 'back' && this.index > 0) { this.index--; this.renderStep(); }
     if (action === 'next') {
-      const steps = this.phase === 'create' ? CREATE_STEPS : COLLECT_STEPS;
+      const { steps } = TOURS[this.phase];
       if (this.index < steps.length - 1) { this.index++; this.renderStep(); }
       else if (this.phase === 'create') this.pauseForCase();
       else this.close();
@@ -247,7 +283,8 @@ export class CaseTour {
 
   close({ clearPending = true, restoreFocus = true } = {}) {
     if (!this.phase) return;
-    if (clearPending) remove(sessionStorage, PENDING_KEY);
+    const notes = this.phase === 'notes';
+    if (clearPending && !notes) remove(sessionStorage, PENDING_KEY);
     cancelAnimationFrame(this.frame);
     this.root?.removeEventListener('click', this.onClick);
     this.root?.remove();
@@ -261,7 +298,7 @@ export class CaseTour {
     const app = document.querySelector('#app');
     if (app) app.inert = false;
     if (restoreFocus) {
-      const fallback = document.querySelector('[data-start-case-tour]');
+      const fallback = document.querySelector(notes ? '[data-start-ip-notes-tour]' : '[data-start-case-tour]');
       const previous = this.previousFocus;
       const target = previous?.isConnected && previous !== document.body && previous !== document.documentElement ? previous : fallback;
       target?.focus({ preventScroll: true });

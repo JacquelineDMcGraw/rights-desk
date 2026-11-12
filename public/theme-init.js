@@ -1,8 +1,8 @@
 // Apply the saved palette before styles paint, without waiting for app data.
 (() => {
-  const palettes = ['caramellatte', 'sage', 'midnight', 'highcontrast'];
-  const browserColors = { caramellatte: '#fff7ed', sage: '#fbfaf6', midnight: '#2b2825', highcontrast: '#ffffff' };
-  let theme = 'caramellatte';
+  const palettes = ['graffiti', 'sky', 'caramellatte', 'sage', 'midnight', 'highcontrast'];
+  const browserColors = { graffiti: '#121214', sky: '#142f53', caramellatte: '#fff7ed', sage: '#fbfaf6', midnight: '#2b2825', highcontrast: '#ffffff' };
+  let theme = 'graffiti';
   try {
     const saved = localStorage.getItem('rights-desk-theme-v1');
     if (palettes.includes(saved)) theme = saved;

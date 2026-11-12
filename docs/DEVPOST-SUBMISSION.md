@@ -1,8 +1,6 @@
 # Rights Desk — Devpost submission draft
 
-Prepared November 5, 2026. This is a local writing and recording packet. Replace the repository and video fields with verified public URLs after publication. Confirm every claim against the final working build before submitting.
-
-Readiness: actual local `gemma3:4b` scope inference passed on November 5 Eastern via `npm run verify:ai`. The PayPal flow has mock regression coverage; real Sandbox approval/capture and the public recording remain pending. Keep this readiness note outside the pasted project description.
+Updated November 12, 2026. Paste the project name, tagline, and description into Devpost. Fill the public links after verifying access. The [repo walkthrough](WALKTHROUGH.md) contains the recorded iPhone launch, app screenshots, and a separate verified PayPal Sandbox checkout clip.
 
 ## Project name
 
@@ -10,86 +8,87 @@ Rights Desk
 
 ## Tagline
 
-From proof to permission to payment for independent creators.
+Know what’s changing before you agree. Get paid for the use you approve.
 
 ## Description
 
 ### Inspiration
 
-A creator who sees their work used elsewhere faces several disconnected tasks: preserve the possible use, find relevant records, understand which permissions matter, and decide whether to offer a license. Rights Desk gives independent U.S. creators a phone-sized workspace for that process.
+A photographer lets a local diner use Harbor at Dawn Photo on its printed menus. Later, the diner wants to use the photo in a paid online commercial. The photographer has to find the original agreement, work out what the diner is asking to change, and decide what to allow and charge.
 
-The project responds to a changing visual economy while respecting uncertainty. A matching image does not establish infringement, a missing record does not make a work free to use, and automated signals cannot certify human authorship.
+We built Rights Desk to help independent creators make that decision and keep the resulting permission and payment together.
 
 ### What it does
 
-Rights Desk takes one private case from evidence collection to a voluntary paid permission record. The creator uploads a reference image or screenshot, records the work and suspected use, and runs a search of Openverse, Wikimedia Commons, and the Library of Congress. Each report names its coverage, failures, visual leads, and source links.
+Rights Desk puts the existing permission and the new request side by side. Local AI compares the purpose, where the work will appear, how long the permission lasts, and the territory it covers. Creators can inspect the passages behind each finding, answer missing details one at a time, and save a draft while they check with the buyer.
 
-When the search is incomplete or inconclusive, the app asks for the records the creator can supply: originals, drafts, contracts, licenses, releases, publication history, or registration information. Work type, use channel, and U.S. location shape the checklist and official legal starting points. The location selector covers all 50 states, D.C., and U.S. territories; local prompts indicate where further review is needed.
+In the Harbor Diner example, the photographer decides to allow one 30-second paid online commercial in the United States for 90 days from payment, with photo credit and a $75 fee. The creator checks those terms in the buyer preview and chooses whether to share an offer. The buyer accepts that version of the terms before PayPal Sandbox checkout, and a verified payment creates a receipt for the exact use accepted.
 
-From the same case, the creator describes a proposed licensed use. A local AI model turns that request into a draft of usage, duration, and territory. The app makes assumptions visible and calculates a suggested price from fixed factors. The creator reviews the exact terms and price before approving a buyer link.
-
-The buyer sees the approved offer while the case evidence stays private. After reviewing the terms, the buyer can approve a PayPal Sandbox payment. Rights Desk verifies the completed capture for the exact offer and amount, then records a scoped license receipt in the creator's case. The creator controls sharing; the app sends no demand or notice automatically.
+The iPhone app opens to My desk and includes offline IP Notes for importing a memo, transcribing it on the phone, and saving the edited text alongside the audio. The legal help panel also lets creators and buyers look up nearby law offices by ZIP code and find bar directories and copyright clinic resources.
 
 ### How we built it
 
-The application uses Node.js 22, browser JavaScript, HTML, CSS, and a local file store. PayPal REST OAuth and Orders v2 handle Sandbox order creation and capture. The server checks the PayPal order ID, offer reference, capture completion, currency, and amount before issuing a receipt; repeated capture requests return the same receipt.
+The mobile interface uses HTML, CSS, and JavaScript with a Node.js server. Gemma 3 runs locally through Ollama. The server checks each model quotation against the submitted text and leaves unsupported details open for the creator to review.
 
-Ollama runs the configured local model, `gemma3:4b` by default, with structured JSON output to classify licensed-use scope. Fixed pricing factors remain outside the model, and a creator approves the final offer. If the model is unavailable, the interface explicitly labels the rules fallback. Optional local visual search terms support discovery; ImageMagick compares a small sample of public thumbnails with the reference locally. Private images and supporting records are not sent to public catalog providers.
+The offer records a fixed copy of the approved work, scope, fee, and conditions. The buyer accepts a fingerprint for that exact version. PayPal Orders v2 handles Sandbox checkout. The server checks the completed capture against the order, offer reference, currency, and amount before issuing a receipt.
+
+The iPhone app uses Swift and WebKit to open My desk and an isolated IP Notes workspace. Apple’s on-device speech model handles transcription on compatible iPhones. The ZIP search combines postal location data with nearby OpenStreetMap listings and provides lawyer referral resources.
 
 ### Challenges we ran into
 
-There is no public database of all licensed works or private permissions. We therefore built a report that says which sources were searched and what remains unknown. Search failures remain visible. The app treats a similarity result as a lead for human review.
+“30-second commercial” describes the length of the video and leaves the campaign duration open. We had to keep those details separate and show the passages behind the comparison so the creator could spot the difference.
 
-We also needed payment to belong to the creator's task. Connecting an offer directly to its case means the same record can hold the creation evidence, approved scope, payment confirmation, and permission receipt. Shared links disclose only the offer fields; the private case image and supporting files stay behind the owner session.
+We also had to keep later edits from changing what the buyer accepted. The creator can run a fresh comparison while the offer, payment, and receipt continue to point to the same approved terms.
 
-### Accomplishments
+### Accomplishments that we're proud of
 
-The prototype combines a guided first-case tutorial, evidence collection, source-attributed search, U.S. rights prompts, creator-reviewed scope drafts, and case-linked PayPal Sandbox licensing. It retains uncertainty and the creator's decisions throughout that flow.
+The diner walkthrough shows the local AI comparison, the duration and territory questions, and the photographer’s $75 buyer preview.
+
+We also completed a separate **$25 PayPal Sandbox payment** for a fictional paid Instagram offer. Rights Desk verified the capture and saved a receipt with the exact accepted scope, fee, and terms fingerprint. The recorded $25 checkout demonstrates the payment flow. The Harbor Diner offer is shown at preview.
 
 ### What we learned
 
-AI is useful for turning ordinary language into reviewable scope. Evidence, ownership, and permission still require human judgment. A payment becomes more useful when its record is connected to the exact work and terms it covers.
+A useful comparison needs to show why it flagged a change and what question the creator should ask next. Giving the creator room to pause, verify the source, and review the buyer preview makes the final decision easier to explain to both parties.
 
-### What's next
+### What's next for Rights Desk
 
-Add authenticated creator accounts and backup/recovery, authorized reverse-image providers, improved media comparisons, verified ownership review, broader licensed-source access, and production payment routing with webhooks and dispute handling. Local legal prompts would receive ongoing professional review. These are future work rather than claims about the hackathon build.
+We want to test this with independent creators using their own agreements and follow-up messages. We’ll look at whether they can identify what changed, ask the right questions, and share clear terms. Accounts, draft recovery across devices, and production seller payment routing would support real transactions.
 
 ## Built with
 
-Node.js 22, JavaScript, HTML, CSS, PayPal Sandbox REST OAuth, PayPal Orders v2, Ollama, Gemma 3, ImageMagick, Openverse API, Wikimedia Commons API, Library of Congress API. Include ExifTool/C2PA only if the final demo environment actually uses them. Disclose AI coding assistance used during development in any form field that asks about it.
+Node.js 22, JavaScript, HTML, CSS, Swift, WebKit, Apple SpeechAnalyzer, Ollama, Gemma 3, PayPal Sandbox REST OAuth, PayPal Orders v2, and OpenStreetMap.
 
 ## Links to complete
 
-| Field | Final value |
+| Field | Value |
 | --- | --- |
-| Development repository | https://github.com/JacquelineDMcGraw/rights-desk — private by request; public access remains pending |
-| Demo access | Repository setup instructions; hosted URL optional |
-| Public YouTube video | Pending actual model and Sandbox recording |
-| License | MIT, included at repository root |
+| Development repository | [JacquelineDMcGraw/rights-desk](https://github.com/JacquelineDMcGraw/rights-desk). Public access is pending. |
+| Demo access | [Quickstart](../README.md#judge-quickstart-from-a-clean-checkout) and [illustrated walkthrough](WALKTHROUGH.md). |
+| Public YouTube video | Final review, narration, and public upload are pending. |
+| License | [MIT](../LICENSE). |
 
 ## 2:50 phone demo script
 
+Aim for a cut under three minutes. Use the [walkthrough](WALKTHROUGH.md) for the exact example text, inputs, and recorded media.
+
 | Time | Show | Voiceover |
 | --- | --- | --- |
-| 0:00–0:15 | Protect opening and an authorized sample work | “A creator sees their work used elsewhere. Rights Desk helps them preserve the facts, understand their options, and offer clear permission.” |
-| 0:15–0:40 | Create a private case; briefly show the spotlight guide and saved reference | “I add the work, where I saw it, and the U.S. location. The case keeps the reference and its exact file fingerprint.” |
-| 0:40–1:00 | Real search coverage and source links | “This report names the collections checked and any gaps. A visual lead gives me a record to review; it does not decide ownership or infringement.” |
-| 1:00–1:20 | Supporting record and tailored checklist | “If search is inconclusive, I collect my originals and permissions. The checklist changes with the work and use, and links to official rights sources.” |
-| 1:20–1:45 | Plain-language request, actual AI draft badge, assumptions, creator review | “I can offer permission for a specific use. The local AI drafts scope, fixed rules suggest a price, and I approve the exact terms before sharing.” |
-| 1:45–2:05 | Buyer link in another session; limited offer terms | “The buyer sees the approved scope and price. My private evidence stays in the case.” |
-| 2:05–2:35 | Actual PayPal Sandbox approval and verified receipt | “PayPal handles the Sandbox payment. Rights Desk checks the completed capture against this offer and amount before issuing the receipt.” |
-| 2:35–2:50 | Creator reopens case and sees paid offer and receipt | “Now the case connects proof, permission, and payment in one place. Rights Desk helps independent creators turn a confusing rights question into a documented next step.” |
+| 0:00–0:33 | iPhone icon opens My desk, then the photo and diner story | “Harbor Diner can use my photo in its printed menus. Now it wants to use the same photo in a commercial.” |
+| 0:33–0:58 | Fresh review, existing permission, and proposed use | “I save the original permission and add the new request. Rights Desk keeps both records in my case.” |
+| 0:58–1:19 | AI comparison and clarification | “The comparison shows me the exact wording. I enter 90 days from payment and United States only.” |
+| 1:19–1:38 | Creator terms and $75 buyer preview | “I require photo credit and preview a $75 offer for one 30-second commercial.” |
+| 1:38–1:53 | Recorded $25 Sandbox checkout and receipt | “This separate $25 Sandbox test shows the accepted terms carried through to a verified receipt.” |
+| 1:53–2:15 | Creator context and legal help | “When I need advice, I can look up nearby law offices or find a referral and ask about copyright or licensing.” |
+| 2:15–2:50 | IP Notes and closing | “On iPhone, I can import a memo, transcribe it on the device, and save it with the audio.” |
 
-Preload records where needed for pacing, but show actual working actions and results. Pause recording while typing credentials. Do not insert a mock payment result or describe a rules fallback as model output. The case-offer receipt does not deliver the original media file or settle prior allegations.
+Review the finished video for runtime, scope labels, and any private information before uploading.
 
 ## Final entry review
 
-- [x] One actual local draft verified the configured AI model was used; repeat it in the video.
-- [ ] One actual PayPal Sandbox approval/capture creates the same offer's receipt.
-- [ ] The phone demonstration runs under three minutes and contains only authorized material.
-- [ ] Repository and public YouTube URLs are correct and open for judges.
-- [ ] Setup instructions reproduce the required model and Sandbox paths without exposing secrets.
-- [ ] Submission accurately identifies model, tools, current limitations, and work completed during the hackathon.
-- [ ] Jackie reviews the final Devpost entry and any required agreement before submission.
+- [x] Actual local AI comparison and separate completed $25 Sandbox payment verified.
+- [x] Illustrated repo walkthrough and recorded app and payment clips prepared.
+- [ ] Final video reviewed, under three minutes, and uploaded publicly.
+- [ ] Repository URL accessible to judges and setup steps confirmed from a clean checkout.
+- [ ] Jackie reviews and submits the final entry.
 
-Official requirements checked November 5, 2026: [PayPal AI Hackathon rules](https://paypalaihackathon.devpost.com/rules). Deadline: November 12, 2026, noon Pacific / 3 p.m. Eastern. Keep the functioning build available through the judging period ending December 15, 2026.
+[PayPal AI Hackathon rules](https://paypalaihackathon.devpost.com/rules)
